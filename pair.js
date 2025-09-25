@@ -524,12 +524,10 @@ function setupCommandHandlers(socket, number) {
                                    `> ᴛʜᴇ ʙᴇꜱᴛ ᴍᴜʟᴛɪ ᴅᴇᴠɪᴄᴇ ᴍɪɴɪ ᴡᴀ ʙᴏᴛ.\n` +
                                    `*❲🧚‍♂️❳ ᴅᴇᴘʟᴏʏ*\n` 
                                    `𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n`
-                     
                                    `╭─〔  S T A T U S  🧼 〕─╮\n`
                                    `│ ∘ Name     : @BLOOD-XMD\n`
                                    `│ ∘ Platform : Heroku\n`
                                    `╰─────────────╯`
-
                                    `➤ 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒\n`
                                    `┏━━━━━━ ❍ ━━━━━━┓\n`
                                    `🛠️ *SYSTEM COMMANDS*\n`
@@ -537,7 +535,6 @@ function setupCommandHandlers(socket, number) {
                                    `• 🔌 .system — Bot System\n`
                                    `• 🧪 .ping — Check speed\n`
                                    `• 🆔 .jid — Get your JID\n`
-
                                    `🖼️ *MEDIA TOOLS*\n`
                                    `• 👁‍🗨 .vv — View once unlock\n`
                                    `• ⭐ .getdp — Downlode Dp\n`
@@ -545,7 +542,6 @@ function setupCommandHandlers(socket, number) {
                                    `• 💾 .save / send — Status saver\n`
                                    `• 🍭 .yts — Youtube search\n`
                                    `• 📋 .tiktoksearch — tiktoksearch\n`
-
                                    `📥 *DOWNLOADERS*\n`
                                    `• 🎧 .song — Download song\n`
                                    `• 📂 .csend — Channel Song Send\n`
