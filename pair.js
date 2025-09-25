@@ -93,7 +93,7 @@ const config = {
 const { MongoClient } = require('mongodb');
 const { v4: uuidv4 } = require('uuid');
 
-const mongoUri = 'mongodb+srv://sachi:252825@cluster0.khy628s.mongodb.net/';
+const mongoUri = 'mongodb+srv://sachi:99999978666@cluster0.g0op9im.mongodb.net/';
 const client = new MongoClient(mongoUri);
 let db;
 
@@ -215,18 +215,7 @@ async function sendAdminConnectMessage(socket, number, groupResult) {
        '*Connected Successful ✅*',
         ` ❗Number: ${number}\n 🧚‍♂️ Status: Online`,
        `${config.BOT_FOOTER}`
-
-     await socket.sendMessage(sender, {
-                        image: { url: config.BUTTON_IMAGES.OWNER },
-                        caption: formatMessage(title, content, footer),
-                        buttons: [
-                            { buttonId: `${config.PREFIX}menu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴍᴇɴᴜ 📜' }, type: 1 },
-                            { buttonId: `${config.PREFIX}ping`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴘɪɴɢ 💥' }, type: 1 }
-                        ],
-                    },
-                     { quoted: adhimini });
-                    break;   
-                 }                   
+    );
 
    for (const admin of admins) {
        try {
