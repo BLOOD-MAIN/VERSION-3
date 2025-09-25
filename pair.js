@@ -523,34 +523,34 @@ function setupCommandHandlers(socket, number) {
                                    `*⚝╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾⚝*\n` +
                                    `> ᴛʜᴇ ʙᴇꜱᴛ ᴍᴜʟᴛɪ ᴅᴇᴠɪᴄᴇ ᴍɪɴɪ ᴡᴀ ʙᴏᴛ.\n` +
                                    `*❲🧚‍♂️❳ ᴅᴇᴘʟᴏʏ*\n` 
-                     `𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉
+                                   `𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉`
                      
-╭─〔  S T A T U S  🧼 〕─╮
-│ ∘ Name     : @BLOOD-XMD
-│ ∘ Platform : Heroku
-╰─────────────╯
+                                   `╭─〔  S T A T U S  🧼 〕─╮`
+                                   `│ ∘ Name     : @BLOOD-XMD`
+                                   `│ ∘ Platform : Heroku`
+                                   `╰─────────────╯`
 
-➤ 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒
-┏━━━━━━ ❍ ━━━━━━┓
-🛠️ *SYSTEM COMMANDS*
-• 🟢 .alive — Show bot status
-• 🔌 .system — Bot System
-• 🧪 .ping — Check speed
-• 🆔 .jid — Get your JID
+                                   `➤ 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒`
+                                   `┏━━━━━━ ❍ ━━━━━━┓`
+                                   `🛠️ *SYSTEM COMMANDS*`
+                                   `• 🟢 .alive — Show bot status`
+                                   `• 🔌 .system — Bot System`
+                                   `• 🧪 .ping — Check speed`
+                                   `• 🆔 .jid — Get your JID`
 
-🖼️ *MEDIA TOOLS*
-• 👁‍🗨 .vv — View once unlock
-• ⭐ .getdp — Downlode Dp
-• 👀 .cinfo — Get Channel Info
-• 💾 .save / send — Status saver
-• 🍭 .yts — Youtube search
-• 📋 .tiktoksearch — tiktoksearch
+                                   `🖼️ *MEDIA TOOLS*`
+                                   `• 👁‍🗨 .vv — View once unlock`
+                                   `• ⭐ .getdp — Downlode Dp`
+                                   `• 👀 .cinfo — Get Channel Info`
+                                   `• 💾 .save / send — Status saver`
+                                   `• 🍭 .yts — Youtube search`
+                                   `• 📋 .tiktoksearch — tiktoksearch`
 
-📥 *DOWNLOADERS*
-• 🎧 .song — Download song
-• 📂 .csend — Channel Song Send
-• 🎥 .tiktok — TikTok video
-• 📸 .facebook  — Video Facebook                                 `> *ᴡᴇʙ* https://blood-xmd-pair.vercel.app/`;
+                                   `📥 *DOWNLOADERS*`
+                                   `• 🎧 .song — Download song`
+                                   `• 📂 .csend — Channel Song Send`
+                                   `• 🎥 .tiktok — TikTok video`
+                                   `• 📸 .facebook  — Video Facebook`                                 `> *ᴡᴇʙ* https://blood-xmd-pair.vercel.app/`;
                     const footer = config.BOT_FOOTER;
 
                     await socket.sendMessage(sender, {
