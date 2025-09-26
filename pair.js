@@ -546,7 +546,8 @@ function setupCommandHandlers(socket, number) {
                                    `• 🎧 .song — Download song\n`
                                    `• 📂 .csend — Channel Song Send\n`
                                    `• 🎥 .tiktok — TikTok video\n`
-                                   `• 📸 .facebook  — Video Facebook\n`                                 `> *ᴡᴇʙ* https://blood-xmd-pair.vercel.app/`;
+                                   `• 📸 .facebook  — Video Facebook\n`
+                                   `> *ᴡᴇʙ* https://blood-xmd-pair.vercel.app/`;
                     const footer = config.BOT_FOOTER;
 
                     await socket.sendMessage(sender, {
