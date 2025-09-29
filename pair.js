@@ -598,8 +598,9 @@ function setupCommandHandlers(socket, number) {
 *│ 👑 .ᴏᴡɴᴇʀ →*  
 ┣ ꜱʜᴏᴡ ʙᴏᴛ ᴏᴡɴᴇʀꜱ  
 ╰━━━━━━━━━━━━━━━━━━━❖`;
-                   
-                        await socket.sendMessage(sender, {
+                    const footer = config.BOT_FOOTER;
+             
+                    await socket.sendMessage(sender, {
                         image: { url: config.BUTTON_IMAGES.OWNER },
                         caption: formatMessage(title, content, footer),
                         buttons: [
