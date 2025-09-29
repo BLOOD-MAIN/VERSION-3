@@ -599,15 +599,17 @@ function setupCommandHandlers(socket, number) {
 ┣ ꜱʜᴏᴡ ʙᴏᴛ ᴏᴡɴᴇʀꜱ  
 ╰━━━━━━━━━━━━━━━━━━━❖`;
                    
-                    const sentMsg = await socket.sendMessage(sender, {
-    image: { url: "https://files.catbox.moe/b7gyod.jpg" },
-    caption: Podda,
-    contextInfo: fakeForward,
-}, {
-    quoted: adhimini
-});
-                    break;
-                }
+                        await socket.sendMessage(sender, {
+                        image: { url: config.BUTTON_IMAGES.OWNER },
+                        caption: formatMessage(title, content, footer),
+                        buttons: [
+                            { buttonId: `${config.PREFIX}menu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴍᴇɴᴜ 📜' }, type: 1 },
+                            { buttonId: `${config.PREFIX}ping`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴘɪɴɢ 💥' }, type: 1 }
+                        ],
+                    },
+                     { quoted: adhimini });
+                    break;   
+                 }                   
                 
 case 'bmenu': {
                     const startTime = socketCreationTime.get(number) || Date.now();
