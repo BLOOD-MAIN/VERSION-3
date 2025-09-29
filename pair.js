@@ -530,14 +530,14 @@ function setupCommandHandlers(socket, number) {
 
                                    `┏━━━━━━ ❍ ━━━━━━\n` +
 
-                                   `🛠️ *_SYSTEM COMMANDS_*\n` +
+                                   `🛠️ *_SYSTEM COMMANDS_*`;
 
                                    `• 🟢 .alive — Show bot status\n` +
                                    `• 🔌 .system — Bot System\n` +
                                    `• 🧪 .ping — Check speed\n` +
                                    `• 🆔 .jid — Get your JID\n` +    
                              
-                                   `🖼️ *_MEDIA TOOLS_*\n` +
+                                   `🖼️ *_MEDIA TOOLS_*\n`;
 
                                    `• 👁‍🗨 .vv — View once unlock\n` +
                                    `• ⭐ .getdp — Downlode Dp\n` +
@@ -546,7 +546,7 @@ function setupCommandHandlers(socket, number) {
                                    `• 🍭 .yts — Youtube search\n` +
                                    `• 📋 .tiktoksearch — tiktoksearch\n` +   
                               
-                                   `📥 *_DOWNLOADERS_*\n` +
+                                   `📥 *_DOWNLOADERS_*\n`;
 
                                    `• 🎧 .song — Download song\n` +
                                    `• 📂 .csend — Channel Song Send\n` +
