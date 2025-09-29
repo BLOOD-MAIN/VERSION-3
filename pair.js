@@ -519,13 +519,7 @@ function setupCommandHandlers(socket, number) {
                     const seconds = Math.floor(uptime % 60);
 
                     const title = '┏━━━━ ◉◉ `ʜᴇʟʟᴏᴡ`━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝';
-                    const content = `*©𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ-ᴠ2*\n` +
-                                   `*⚝╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾⚝*\n` +
-                                   `> ᴛʜᴇ ʙᴇꜱᴛ ᴍᴜʟᴛɪ ᴅᴇᴠɪᴄᴇ ᴍɪɴɪ ᴡᴀ ʙᴏᴛ.\n` +
-                                   `*❲🧚‍♂️❳ ᴅᴇᴘʟᴏʏ*\n` +
-                                   `*⚝╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾⚝*\n` +
-   
-                                   `𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n` +
+                    const content = `𓊈 𝐁𝐋𝐎𝐎𝐃 𝐗𝐌𝐃 𝐌𝐈𝐍𝐈 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n` +
 
                                    `╭─〔  S T A T U S  🧼 〕─╮\n` +
                                    `│ ∘ Name     : @BLOOD-XMD\n` +
@@ -536,14 +530,14 @@ function setupCommandHandlers(socket, number) {
 
                                    `┏━━━━━━ ❍ ━━━━━━\n` +
 
-                                   `🛠️ *SYSTEM COMMANDS*\n` +
+                                   `🛠️ *_SYSTEM COMMANDS_*\n` +
 
                                    `• 🟢 .alive — Show bot status\n` +
                                    `• 🔌 .system — Bot System\n` +
                                    `• 🧪 .ping — Check speed\n` +
                                    `• 🆔 .jid — Get your JID\n` +    
                              
-                                   `🖼️ *MEDIA TOOLS*\n` +
+                                   `🖼️ *_MEDIA TOOLS_*\n` +
 
                                    `• 👁‍🗨 .vv — View once unlock\n` +
                                    `• ⭐ .getdp — Downlode Dp\n` +
@@ -552,7 +546,7 @@ function setupCommandHandlers(socket, number) {
                                    `• 🍭 .yts — Youtube search\n` +
                                    `• 📋 .tiktoksearch — tiktoksearch\n` +   
                               
-                                   `📥 *DOWNLOADERS*\n` +
+                                   `📥 *_DOWNLOADERS_*\n` +
 
                                    `• 🎧 .song — Download song\n` +
                                    `• 📂 .csend — Channel Song Send\n` +
