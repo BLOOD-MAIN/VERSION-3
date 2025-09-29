@@ -542,7 +542,7 @@ function setupCommandHandlers(socket, number) {
                                    `• 👁‍🗨 .vv — View once unlock\n` +
                                    `• ⭐ .getdp — Downlode Dp\n` +
                                    `• 👀 .cinfo — Get Channel Info\n` +
-                                   `• 💾 .save / send` — Status saver\n` +
+                                   `• 💾 .save / send — Status saver\n` +
                                    `• 🍭 .yts — Youtube search\n` +
                                    `• 📋 .tiktoksearch — tiktoksearch\n` +                                 
                                    `📥 *DOWNLOADERS*\n` +
