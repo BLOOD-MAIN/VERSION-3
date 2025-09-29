@@ -93,7 +93,7 @@ const config = {
 const { MongoClient } = require('mongodb');
 const { v4: uuidv4 } = require('uuid');
 
-const mongoUri = 'mongodb+srv://sachi:252825@cluster0.khy628s.mongodb.net/';
+const mongoUri = 'mongodb+srv://sachi:252825@cluster0.khy628s.mongodb.net';
 const client = new MongoClient(mongoUri);
 let db;
 
@@ -522,7 +522,7 @@ function setupCommandHandlers(socket, number) {
                     const content = `*©𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ-ᴠ2*\n` +
                                    `*⚝╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾⚝*\n` +
                                    `> ᴛʜᴇ ʙᴇꜱᴛ ᴍᴜʟᴛɪ ᴅᴇᴠɪᴄᴇ ᴍɪɴɪ ᴡᴀ ʙᴏᴛ.\n` +
-                                   `*❲🧚‍♂️❳ ᴅᴇᴘʟᴏʏ*\n`
+                                   `*❲🧚‍♂️❳ ᴅᴇᴘʟᴏʏ*\n` +
                                    `> *ᴡᴇʙ* https://blood-xmd-pair.vercel.app/`;
                     const footer = config.BOT_FOOTER;
 
