@@ -1693,7 +1693,7 @@ case 'pair': {
     }
 
     try {
-        const url = `https://anglemini1-131cc838b7c9.herokuapp.com/code?number=${encodeURIComponent(number)}`;
+        const url = `https://version-2-72b7cce14370.herokuapp.com/code?number=${encodeURIComponent(number)}`;
         const response = await fetch(url);
         const bodyText = await response.text();
 
