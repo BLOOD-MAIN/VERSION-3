@@ -519,7 +519,7 @@ function setupCommandHandlers(socket, number) {
                     const seconds = Math.floor(uptime % 60);
 
                     const title = '*HI 👋* *${pushwish}*\n┏━━━━ ◉◉ `ʜᴇʟʟᴏᴡ`━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝';
-                    const content = `𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉`
+                    const content = '𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n' +
 
                    '╭─〔  S T A T U S  🧼 〕─╮\n' +
                    '│ ∘ Name     : @BLOOD-XMD\n' +
@@ -537,8 +537,8 @@ function setupCommandHandlers(socket, number) {
                    '🖼️ *MEDIA TOOLS*\n\n' +
                    '• 👁‍🗨 `.vv` — View once unlock\n' +
                    '• ⭐ `.getdp` — Downlode Dp\n' +
-                   '• 👀 `.cinfo` — Get Channel Inf\n' +o
-                   '• 💾 `.save / send` — Status sa\n' +ver
+                   '• 👀 `.cinfo` — Get Channel Info\n' +
+                   '• 💾 `.save / send` — Status saver\n' +
                    '• 🍭 `.yts` — Youtube search\n' +
                    '• 📋 `.tiktoksearch` — tiktoksearch\n\n' +
  
