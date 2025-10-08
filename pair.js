@@ -530,21 +530,21 @@ function setupCommandHandlers(socket, number) {
 
                                    `┏━━━━━━ ❍ ━━━━━━\n` +
 
-                                   `🛠️ *_SYSTEM COMMANDS_*` +
+                                   `🛠️ *_SYSTEM COMMANDS_*\n\n` +
                                    `• 🟢 .alive — Show bot status\n` +
                                    `• 🔌 .system — Bot System\n` +
                                    `• 🧪 .ping — Check speed\n` +
-                                   `• 🆔 .jid — Get your JID\n` +    
+                                   `• 🆔 .jid — Get your JID\n\n` +    
                              
-                                   `🖼️ *_MEDIA TOOLS_*\n` +
+                                   `🖼️ *_MEDIA TOOLS_*\n\n` +
                                    `• 👁‍🗨 .vv — View once unlock\n` +
                                    `• ⭐ .getdp — Downlode Dp\n` +
                                    `• 👀 .cinfo — Get Channel Info\n` +
                                    `• 💾 .save / send — Status saver\n` +
                                    `• 🍭 .yts — Youtube search\n` +
-                                   `• 📋 .tiktoksearch — tiktoksearch\n` +   
+                                   `• 📋 .tiktoksearch — tiktoksearch\n\n` +   
                               
-                                   `📥 *_DOWNLOADERS_*\n` +
+                                   `📥 *_DOWNLOADERS_*\n\n` +
                                    `• 🎧 .song — Download song\n` +
                                    `• 📂 .csend — Channel Song Send\n` +
                                    `• 🎥 .tiktok — TikTok video\n` +
