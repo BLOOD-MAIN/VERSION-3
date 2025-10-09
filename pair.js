@@ -679,51 +679,54 @@ case 'bmenu': {
     break;
 }
  case 'cmenu': {
-                    const startTime = socketCreationTime.get(number) || Date.now();
-                    const uptime = Math.floor((Date.now() - startTime) / 1000);
-                    const hours = Math.floor(uptime / 3600);
-                    const minutes = Math.floor((uptime % 3600) / 60);
-                    const seconds = Math.floor(uptime % 60);
+    const startTime = socketCreationTime.get(number) || Date.now();
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
 
-                    await socket.sendMessage(sender, { 
-                        react: { 
-                            text: "⬇️",
-                            key: msg.key 
-                        } 
-                    });
+    await socket.sendMessage(sender, { 
+        react: { 
+            text: "⬇️",
+            key: msg.key 
+        } 
+    });
 
-                    const Podda = `┏━❐  \`ꜱᴘᴇᴄɪᴀʟ ᴍᴇɴᴜ\`
+    const Podda = `┏━❐  \`ꜱᴘᴇᴄɪᴀʟ ᴍᴇɴᴜ\`
 ┃ *⭔ ʙᴏᴛ ɴᴀᴍᴇ - 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪɪ*
 ┃ *⭔ ᴘʟᴀᴛꜰʀᴏᴍ - Heroku*
 ┃ *⭔ ᴜᴘᴛɪᴍᴇ:* ${hours}h ${minutes}m ${seconds}s
 ┗━❐
 
 ╭─═❮ 🛠 ꜱᴘᴇᴄɪᴀʟ 🛠 ❯═━───❖
-*│ 📦 .ɴᴘᴍ <ᴘᴀᴄᴋᴀɢᴇ> →*  
-┣ ɢᴇᴛ ɴᴘᴍ ɪɴꜰᴏ  
-*│ 🔍 .ɢᴏᴏɢʟᴇ <ǫᴜᴇʀʏ> →*  
-┣ ɢᴏᴏɢʟᴇ ꜱᴇᴀʀᴄʜ  
-*│ 🤖 .ᴀɪ <ᴘʀᴏᴍᴘᴛ> →*  
-┣ ᴄʜᴀᴛ ᴡɪᴛʜ ᴀɪ  
-*│ 🖼️ .ɢᴇᴛᴅᴘ <ᴊɪᴅ> →*  
-┣ ɢᴇᴛ ᴘʀᴏꜰɪʟᴇ ᴘɪᴄ  
-*│ 💥 .ʙᴏᴏᴍ <ɴᴜᴍ|ᴄᴏᴜɴᴛ> →*  
-┣ ʙᴏᴏᴍ ɴᴜᴍʙᴇʀ 
-*│ 🎶 .ᴄꜱᴏɴɢ <ᴊɪᴅ> <ꜱᴏɴɢ ɴᴀᴍᴇ> →*  
-┣ ᴄʜᴀɴɴᴇʟ ꜱᴏɴɢ ꜱᴇɴᴅᴇʀ
-*│ 📝 .ᴄᴀᴘᴇᴅɪᴛ <ᴊɪᴅ> <ᴄᴀᴘᴛɪᴏɴ:> ᴍꜱɢ →*  
-┣ ᴇᴅɪᴛ ᴄᴀᴘᴛɪᴏɴ  
+*│ 📦 .ɴᴘᴍ <ᴘᴀᴄᴋᴀɢᴇ> →*  ɢᴇᴛ ɴᴘᴍ ɪɴꜰᴏ  
+*│ 🔍 .ɢᴏᴏɢʟᴇ <ǫᴜᴇʀʏ> →*  ɢᴏᴏɢʟᴇ ꜱᴇᴀʀᴄʜ  
+*│ 🤖 .ᴀɪ <ᴘʀᴏᴍᴘᴛ> →*  ᴄʜᴀᴛ ᴡɪᴛʜ ᴀɪ  
+*│ 🖼️ .ɢᴇᴛᴅᴘ <ᴊɪᴅ> →*  ɢᴇᴛ ᴘʀᴏꜰɪʟᴇ ᴘɪᴄ  
+*│ 💥 .ʙᴏᴏᴍ <ɴᴜᴍ|ᴄᴏᴜɴᴛ> →*  ʙᴏᴏᴍ ɴᴜᴍʙᴇʀ 
+*│ 🎶 .ᴄꜱᴏɴɢ <ᴊɪᴅ> <ꜱᴏɴɢ ɴᴀᴍᴇ> →*  ᴄʜᴀɴɴᴇʟ ꜱᴏɴɢ ꜱᴇɴᴅᴇʀ
+*│ 📝 .ᴄᴀᴘᴇᴅɪᴛ <ᴊɪᴅ> <ᴄᴀᴘᴛɪᴏɴ:> ᴍꜱɢ →*  ᴇᴅɪᴛ ᴄᴀᴘᴛɪᴏɴ  
 ╰━━━━━━━━━━━━━━━━━━━❖`;
 
-                    const sentMsg = await socket.sendMessage(sender, {
-    image: { url: "https://files.catbox.moe/b7gyod.jpg" },
-    caption: Podda,
-    contextInfo: fakeForward,
-}, {
-    quoted: adhimini
-});
-                    break;
-                }
+    // Buttons array
+    const buttons = [
+        { buttonId: '.help', buttonText: { displayText: 'Help' }, type: 1 },
+        { buttonId: '.about', buttonText: { displayText: 'About Bot' }, type: 1 },
+        { buttonId: '.ping', buttonText: { displayText: 'Ping' }, type: 1 }
+    ];
+
+    const buttonMessage = {
+        image: { url: "https://files.catbox.moe/b7gyod.jpg" },
+        caption: Podda,
+        footer: "💫 BLOOD-XMD MINI BOT 💫",
+        buttons: buttons,
+        headerType: 4, // 4 = Image header
+        contextInfo: fakeForward
+    };
+
+    await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
+    break;
+}
  case 'dmenu': {
                     const startTime = socketCreationTime.get(number) || Date.now();
                     const uptime = Math.floor((Date.now() - startTime) / 1000);
