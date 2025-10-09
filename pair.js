@@ -1221,30 +1221,61 @@ case 'facebook': {
             return reply('*𝐏ℓєαʂє 𝐏ɼ๏νιɖє 𝐀 fb҇ 𝐕ιɖє๏ ๏ɼ ɼєєℓ 𝐔ɼℓ..*');
         }
 
+        // Create buttons for different quality
+        const buttons = [
+            { buttonId: `fbquality ${fbUrl} 720`, buttonText: { displayText: '720p' }, type: 1 },
+            { buttonId: `fbquality ${fbUrl} 480`, buttonText: { displayText: '480p' }, type: 1 },
+            { buttonId: `fbquality ${fbUrl} 280`, buttonText: { displayText: '280p' }, type: 1 },
+        ];
+
+        const buttonMessage = {
+            text: '*Choose the video quality for download:*',
+            footer: 'BLOOD XMD Mini Fb Video Dl 🚀',
+            buttons: buttons,
+            headerType: 1
+        };
+
+        await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
+
+    } catch (error) {
+        console.error('Error in Facebook download command:', error);
+        reply('❌ Unable to process your request. Please try again later.');
+    }
+    break;
+}
+
+// New case to handle quality selection
+case 'fbquality': {
+    try {
+        const [fbUrl, quality] = args;
+        if (!fbUrl || !quality) return reply('*❌ Invalid command format!*');
+
         const apiKey = 'e276311658d835109c';
         const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
         const response = await axios.get(apiUrl);
 
-        if (!response.data || !response.data.result || !response.data.result.sd) {
+        if (!response.data || !response.data.result) {
             return reply('*❌ Invalid or unsupported Facebook video URL.*');
         }
 
-        const { title, desc, sd } = response.data.result;
+        // Select video quality
+        let videoUrl;
+        if (quality === '720' && response.data.result.hd) videoUrl = response.data.result.hd;
+        else if (quality === '480' && response.data.result.sd) videoUrl = response.data.result.sd;
+        else if (quality === '280' && response.data.result.low) videoUrl = response.data.result.low;
+        else return reply('*❌ Requested quality not available!*');
 
         await socket.sendMessage(sender, {
-            video: { url: sd },
-            caption: `*BLOOD XMD  Mini Fb Video Dl 🚀❒*`,
-          contextInfo: fakeForward,
-}, {
-    quoted: adhimini
-});
-        
+            video: { url: videoUrl },
+            caption: `*BLOOD XMD Mini Fb Video Dl 🚀* (${quality}p)`,
+            contextInfo: fakeForward
+        }, { quoted: adhimini });
 
     } catch (error) {
         console.error('Error downloading Facebook video:', error);
         reply('❌ Unable to download the Facebook video. Please try again later.');
     }
-break;
+    break;
 }
                 case 'system': {
                     const title = "*❗ ꜱʏꜱᴛᴇᴍ ɪɴꜰᴏ ❗*";
