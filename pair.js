@@ -1879,23 +1879,19 @@ case 'pair': {
                  }
                   
             case 'cid': {
-    // Extract query from message
     const q = msg.message?.conversation ||
               msg.message?.extendedTextMessage?.text ||
               msg.message?.imageMessage?.caption ||
               msg.message?.videoMessage?.caption || '';
 
-    // Clean command prefix (.cid, /cid, !cid, etc.)
     const channelLink = q.replace(/^[.\/!]cid\s*/i, '').trim();
 
-    // Check if link is provided
     if (!channelLink) {
         return await socket.sendMessage(sender, {
             text: '❎ Please provide a WhatsApp Channel link.\n\n📌 *Example:* .cid https://whatsapp.com/channel/123456789'
         }, { quoted: adhimini });
     }
 
-    // Validate link
     const match = channelLink.match(/whatsapp\.com\/channel\/([\w-]+)/);
     if (!match) {
         return await socket.sendMessage(sender, {
@@ -1906,12 +1902,10 @@ case 'pair': {
     const inviteId = match[1];
 
     try {
-        // Send fetching message
         await socket.sendMessage(sender, {
             text: `🔎 Fetching channel info for: *${inviteId}*`
         }, { quoted: adhimini });
 
-        // Get channel metadata
         const metadata = await socket.newsletterMetadata("invite", inviteId);
 
         if (!metadata || !metadata.id) {
@@ -1920,7 +1914,6 @@ case 'pair': {
             }, { quoted: adhimini });
         }
 
-        // Format details
         const infoText = `
 📡 *WhatsApp Channel Info*
 
@@ -1930,17 +1923,19 @@ case 'pair': {
 📅 *Created on:* ${metadata.creation_time ? new Date(metadata.creation_time * 1000).toLocaleString("id-ID") : 'Unknown'}
 `;
 
-        // Send preview if available
-        if (metadata.preview) {
-            await socket.sendMessage(sender, {
-                image: { url: `https://pps.whatsapp.net${metadata.preview}` },
-                caption: infoText
-            }, { quoted: msg });
-        } else {
-            await socket.sendMessage(sender, {
-                text: infoText
-            }, { quoted: msg });
-        }
+        // Buttons
+        const buttons = [
+            { buttonId: `copy_${inviteId}`, buttonText: { displayText: 'Copy Newsletter' }, type: 1 },
+            { buttonId: `searchagain`, buttonText: { displayText: 'Search Again' }, type: 1 }
+        ];
+
+        // Send message with buttons
+        await socket.sendMessage(sender, {
+            text: infoText,
+            footer: 'BLOOD XMD MINI BOT',
+            buttons: buttons,
+            headerType: 1
+        }, { quoted: msg });
 
     } catch (err) {
         console.error("CID command error:", err);
@@ -1948,7 +1943,25 @@ case 'pair': {
             text: '⚠️ An unexpected error occurred while fetching channel info.'
         }, { quoted: msg });
     }
+    break;
+}
 
+// Button click handler
+case 'buttons_response': {
+    const buttonId = msg.buttonId;
+
+    if (buttonId?.startsWith('copy_')) {
+        const newsletterId = buttonId.replace('copy_', '');
+        await socket.sendMessage(sender, { 
+            text: `✅ Newsletter link:\nhttps://whatsapp.com/channel/${newsletterId}` 
+        }, { quoted: msg });
+    }
+
+    if (buttonId === 'searchagain') {
+        await socket.sendMessage(sender, { 
+            text: '🔎 Please enter the WhatsApp Channel link to search again.' 
+        }, { quoted: msg });
+    }
     break;
 }  
                  case 'getdp':
