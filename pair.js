@@ -74,7 +74,7 @@ const config = {
     MAX_RETRIES: 3,
     GROUP_INVITE_LINK: 'https://chat.whatsapp.com/JUj7YfDEAxJ5LoBBeo85Ba',
     ADMIN_LIST_PATH: './admin.json',
-    IMAGE_PATH: 'https://files.catbox.moe/b7gyod.jpg',
+    IMAGE_PATH: 'https://files.catbox.moe/lwdp9g.jpg',
     NEWSLETTER_JID: '120363404348971495@newsletter',
     NEWSLETTER_MESSAGE_ID: '428',
     OTP_EXPIRY: 300000,
@@ -86,7 +86,7 @@ const config = {
     BOT_FOOTER: '> 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ',
     CHANNEL_LINK: 'https://whatsapp.com/channel/0029Vb6rcemKwqSMwW4l5w0l',
     BUTTON_IMAGES: {
-        OWNER: 'https://files.catbox.moe/b7gyod.jpg'
+        OWNER: 'https://files.catbox.moe/lwdp9g.jpg'
     }
 };
 
@@ -667,7 +667,7 @@ case 'bmenu': {
     ];
 
     const buttonMessage = {
-        image: { url: "https://files.catbox.moe/b7gyod.jpg" },
+        image: { url: "https://files.catbox.moe/lwdp9g.jpg" },
         caption: Podda,
         footer: '𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪɪ • Download Menu',
         buttons: buttons,
@@ -716,7 +716,7 @@ case 'bmenu': {
     ];
 
     const buttonMessage = {
-        image: { url: "https://files.catbox.moe/b7gyod.jpg" },
+        image: { url: "https://files.catbox.moe/lwdp9g.jpg" },
         caption: Podda,
         footer: "💫 BLOOD-XMD MINI BOT 💫",
         buttons: buttons,
@@ -763,7 +763,7 @@ case 'bmenu': {
     ];
 
     const buttonMessage = {
-        image: { url: "https://files.catbox.moe/b7gyod.jpg" },
+        image: { url: "https://files.catbox.moe/lwdp9g.jpg" },
         caption: Podda,
         footer: "💫 BLOOD-XMD MINI BOT 💫",
         buttons: buttons,
@@ -1297,7 +1297,7 @@ case 'fbquality': {
                     const footer = config.BOT_FOOTER;
 
                     await socket.sendMessage(sender, {
-                        image: { url: `https://files.catbox.moe/b7gyod.jpg` },
+                        image: { url: `https://files.catbox.moe/lwdp9g.jpg` },
                         caption: formatMessage(title, content, footer),
                       contextInfo: fakeForward,
 }, {
@@ -1551,7 +1551,7 @@ case 'settings': {
 `;
 
     const menuMsg = await socket.sendMessage(sender, {
-      image: { url: "https://files.catbox.moe/fjpgep.jpg" },
+      image: { url: "https://files.catbox.moe/lwdp9g.jpg" },
       caption: desc,
       contextInfo: fakeForward
     }, { quoted: adhimini });
