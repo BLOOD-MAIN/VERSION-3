@@ -520,20 +520,25 @@ function setupCommandHandlers(socket, number) {
 
     const title = '*HI 👋* *${pushwish}*\n┏━━━━ ◉◉ `ʜᴇʟʟᴏᴡ`━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝';
 
+    const channelName = "BLOOD-XMD Official Channel"; // Channel name
+    const newsletter = "Subscribe to our newsletter for updates"; // Newsletter info
+
     const content = '𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n' +
         '╭─〔  S T A T U S  🧼 〕─╮\n' +
         '│ ∘ Name     : @BLOOD-XMD\n' +
         '│ ∘ Platform : Heroku\n' +
+        `│ ∘ Channel  : ${channelName}\n` +
         '╰─────────────╯\n\n' +
         '➤ 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒\n' +
         '┏━━━━━━ ❍ ━━━━━━┓\n\n' +
-        '🛠️ *SYSTEM COMMANDS*\n\n' +
+        '🛠️ *SYSTEM COMMANDS*\n' +
         '• 🟢 `.alive`\n• 🔌 `.system`\n• 🧪 `.ping`\n• 🆔 `.jid`\n\n' +
-        '🖼️ *MEDIA TOOLS*\n\n' +
+        '🖼️ *MEDIA TOOLS*\n' +
         '• 👁‍🗨 `.vv`\n• ⭐ `.getdp`\n• 👀 `.cinfo`\n• 💾 `.save / send`\n• 🍭 `.yts`\n• 📋 `.tiktoksearch`\n\n' +
-        '📥 *DOWNLOADERS*\n\n' +
+        '📥 *DOWNLOADERS*\n' +
         '• 🎧 `.song`\n• 📂 `.csend`\n• 🎥 `.tiktok`\n• 📸 `.facebook`\n• 🎬 `.video`\n\n' +
         '╭───────𓍯───────╮\n' +
+        `▫️Newsletter: ${newsletter}\n` +
         '▫️Mini Bot Web 🌐\n> https://free-bot-site-six.vercel.app/\n' +
         '╰───────𓍯───────╯';
 
@@ -543,9 +548,9 @@ function setupCommandHandlers(socket, number) {
     const fakeForward = { forwardingScore: 999, isForwarded: true };
     const Podda = formatMessage(title, content, footer);
 
-    // Send original menu as fake forward
+    // Send original menu as fake forward using custom image
     const sentMsg = await socket.sendMessage(sender, {
-        image: { url: config.BUTTON_IMAGES.OWNER }, // menu image
+        image: { url: "https://files.catbox.moe/b7gyod.jpg" }, // Custom fake forward image
         caption: Podda,
         contextInfo: fakeForward,
         buttons: [
