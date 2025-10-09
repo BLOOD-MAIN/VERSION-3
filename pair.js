@@ -518,8 +518,8 @@ function setupCommandHandlers(socket, number) {
     const minutes = Math.floor((uptime % 3600) / 60);
     const seconds = Math.floor(uptime % 60);
 
-    const title = `*HI 👋* *${pushwish}*\n┏━━━━ ◉◉ 'ʜᴇʟʟᴏᴡ'━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝`;
-    
+    const title = `*HI 👋* ${pushwish || ''}\n┏━━━━ ◉◉ 'ʜᴇʟʟᴏᴡ'━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝`;
+
     const content = '𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n' +
         '╭─〔  S T A T U S  🧼 〕─╮\n' +
         '│ ∘ Name     : @BLOOD-XMD\n' +
@@ -534,11 +534,11 @@ function setupCommandHandlers(socket, number) {
         '• 🆔 `.jid` — Get your JID\n\n' +
         '🖼️ *MEDIA TOOLS*\n\n' +
         '• 👁‍🗨 `.vv` — View once unlock\n' +
-        '• ⭐ `.getdp` — Downlode Dp\n' +
+        '• ⭐ `.getdp` — Download Dp\n' +
         '• 👀 `.cinfo` — Get Channel Info\n' +
         '• 💾 `.save / send` — Status saver\n' +
         '• 🍭 `.yts` — Youtube search\n' +
-        '• 📋 `.tiktoksearch` — tiktoksearch\n\n' +
+        '• 📋 `.tiktoksearch` — TikTok search\n\n' +
         '📥 *DOWNLOADERS*\n\n' +
         '• 🎧 `.song` — Download song\n' +
         '• 📂 `.csend` — Channel Song Send\n' +
@@ -550,7 +550,7 @@ function setupCommandHandlers(socket, number) {
         '> https://free-bot-site-six.vercel.app/\n' +
         '╰───────𓍯───────╯';
 
-    const footer = config.BOT_FOOTER;
+    const footer = config.BOT_FOOTER || '';
 
     const fakeForward = {
         forwardingScore: 1,
@@ -562,10 +562,12 @@ function setupCommandHandlers(socket, number) {
         }
     };
 
+    const caption = `${title}\n\n${content}\n\n${footer}`;
+
     await socket.sendMessage(sender, {
-        image: { url: config.BUTTON_IMAGES.OWNER }, // MENU image
-        caption: formatMessage(title, content, footer),
-        contextInfo: fakeForward, // ← fake forward attached here
+        image: { url: config.BUTTON_IMAGES.OWNER },
+        caption: caption,
+        contextInfo: fakeForward, // ← fake forward applied here
         buttons: [
             { buttonId: `${config.PREFIX}amenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴍᴀɪɴ ᴍᴇɴᴜ 🎛️' }, type: 1 },
             { buttonId: `${config.PREFIX}bmenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴅᴏᴡɴʟᴏᴀᴅ ᴍᴇɴᴜ 📥' }, type: 1 },
