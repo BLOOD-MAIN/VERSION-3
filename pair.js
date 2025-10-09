@@ -728,47 +728,52 @@ case 'bmenu': {
     break;
 }
  case 'dmenu': {
-                    const startTime = socketCreationTime.get(number) || Date.now();
-                    const uptime = Math.floor((Date.now() - startTime) / 1000);
-                    const hours = Math.floor(uptime / 3600);
-                    const minutes = Math.floor((uptime % 3600) / 60);
-                    const seconds = Math.floor(uptime % 60);
+    const startTime = socketCreationTime.get(number) || Date.now();
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
 
-                    await socket.sendMessage(sender, { 
-                        react: { 
-                            text: "⬇️",
-                            key: msg.key 
-                        } 
-                    });
+    await socket.sendMessage(sender, { 
+        react: { 
+            text: "⬇️",
+            key: msg.key 
+        } 
+    });
 
-                    const Podda = `┏━❐  \`ᴏᴛʜᴇʀ ᴍᴇɴᴜ\`
+    const Podda = `┏━❐  \`ᴏᴛʜᴇʀ ᴍᴇɴᴜ\`
 ┃ *⭔ ʙᴏᴛ ɴᴀᴍᴇ - 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪɪ*
 ┃ *⭔ ᴘʟᴀᴛꜰʀᴏᴍ - Heroku*
 ┃ *⭔ ᴜᴘᴛɪᴍᴇ:* ${hours}h ${minutes}m ${seconds}s
 ┗━❐
 
 ╭─═❮ 🔗 ᴏᴛʜᴇʀ 🔗 ❯═━───❖
-*│ 🔗 .ᴘᴀɪʀ <ᴄᴏᴅᴇ> →*  
-┣ ᴘᴀɪʀ ꜱᴇꜱꜱɪᴏɴ  
-*│ 🆔 .ᴊɪᴅ →*  
-┣ ɢᴇᴛ ᴄʜᴀᴛ ᴊɪᴅ  
-*│ 📡 .ᴄɪᴅ <ʟɪɴᴋ> →*  
-┣ ɢᴇᴛ ᴄʜᴀɴɴᴇʟ ɪɴꜰᴏ  
-*│ 🎥 .vv →*  
-┣ ᴠɪᴇᴡ ᴏɴᴄᴇ ᴜɴʟᴏᴄᴋ
-*│ 📤 .ꜱᴇɴᴅ →*  
-┣ ꜱᴛᴀᴛᴜꜱ ᴅᴏᴡɴʟᴏᴀᴅ
+*│ 🔗 .ᴘᴀɪʀ <ᴄᴏᴅᴇ> →*  ᴘᴀɪʀ ꜱᴇꜱꜱɪᴏɴ  
+*│ 🆔 .ᴊɪᴅ →*  ɢᴇᴛ ᴄʜᴀᴛ ᴊɪᴅ  
+*│ 📡 .ᴄɪᴅ <ʟɪɴᴋ> →*  ɢᴇᴛ ᴄʜᴀɴɴᴇʟ ɪɴꜰᴏ  
+*│ 🎥 .vv →*  ᴠɪᴇᴡ ᴏɴᴄᴇ ᴜɴʟᴏᴄᴋ
+*│ 📤 .ꜱᴇɴᴅ →*  ꜱᴛᴀᴛᴜꜱ ᴅᴏᴡɴʟᴏᴀᴅ
 ╰━━━━━━━━━━━━━━━━━━━❖`;
 
-                    const sentMsg = await socket.sendMessage(sender, {
-    image: { url: "https://files.catbox.moe/b7gyod.jpg" },
-    caption: Podda,
-    contextInfo: fakeForward,
-}, {
-  quoted: adhimini                    
-});
-                    break;
-                }                                                   
+    // Buttons
+    const buttons = [
+        { buttonId: '.help', buttonText: { displayText: 'Help' }, type: 1 },
+        { buttonId: '.pair', buttonText: { displayText: 'Pair' }, type: 1 },
+        { buttonId: '.about', buttonText: { displayText: 'About Bot' }, type: 1 }
+    ];
+
+    const buttonMessage = {
+        image: { url: "https://files.catbox.moe/b7gyod.jpg" },
+        caption: Podda,
+        footer: "💫 BLOOD-XMD MINI BOT 💫",
+        buttons: buttons,
+        headerType: 4, // Image header
+        contextInfo: fakeForward
+    };
+
+    await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
+    break;
+}                                                   
 
 ///kkkkkk
 
