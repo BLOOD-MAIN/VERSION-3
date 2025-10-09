@@ -512,61 +512,60 @@ function setupCommandHandlers(socket, number) {
                     break;   
                  }                   
                case 'menu': {
-                    const startTime = socketCreationTime.get(number) || Date.now();
-                    const uptime = Math.floor((Date.now() - startTime) / 1000);
-                    const hours = Math.floor(uptime / 3600);
-                    const minutes = Math.floor((uptime % 3600) / 60);
-                    const seconds = Math.floor(uptime % 60);
+    const startTime = socketCreationTime.get(number) || Date.now();
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
 
-                    const title = '*HI 👋* *${pushwish}*\n┏━━━━ ◉◉ `ʜᴇʟʟᴏᴡ`━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝';
-                    const content = '𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n' +
+    const title = '*HI 👋* *${pushwish}*\n┏━━━━ ◉◉ `ʜᴇʟʟᴏᴡ`━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝';
+    const content = '𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n' +
 
-                   '╭─〔  S T A T U S  🧼 〕─╮\n' +
-                   '│ ∘ Name     : @BLOOD-XMD\n' +
-                   '│ ∘ Platform : Heroku\n' +
-                   '╰─────────────╯\n\n' +
+    '╭─〔  S T A T U S  🧼 〕─╮\n' +
+    '│ ∘ Name     : @BLOOD-XMD\n' +
+    '│ ∘ Platform : Heroku\n' +
+    '╰─────────────╯\n\n' +
 
-                   '➤ 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒\n' +
-                   '┏━━━━━━ ❍ ━━━━━━┓\n\n' +
-                   '🛠️ *SYSTEM COMMANDS*\n\n' +
-                   '• 🟢 `.alive` — Show bot status\n' +
-                   '• 🔌 `.system` — Bot System\n' +
-                   '• 🧪 `.ping` — Check speed\n' +
-                   '• 🆔 `.jid` — Get your JID\n\n' +
+    '➤ 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒\n' +
+    '┏━━━━━━ ❍ ━━━━━━┓\n\n' +
+    '🛠️ *SYSTEM COMMANDS*\n\n' +
+    '• 🟢 `.alive`\n• 🔌 `.system`\n• 🧪 `.ping`\n• 🆔 `.jid`\n\n' +
+    '🖼️ *MEDIA TOOLS*\n\n' +
+    '• 👁‍🗨 `.vv`\n• ⭐ `.getdp`\n• 👀 `.cinfo`\n• 💾 `.save / send`\n• 🍭 `.yts`\n• 📋 `.tiktoksearch`\n\n' +
+    '📥 *DOWNLOADERS*\n\n' +
+    '• 🎧 `.song`\n• 📂 `.csend`\n• 🎥 `.tiktok`\n• 📸 `.facebook`\n• 🎬 `.video`\n\n' +
+    '╭───────𓍯───────╮\n' +
+    '▫️Mini Bot Web 🌐\n> https://free-bot-site-six.vercel.app/\n' +
+    '╰───────𓍯───────╯';
 
-                   '🖼️ *MEDIA TOOLS*\n\n' +
-                   '• 👁‍🗨 `.vv` — View once unlock\n' +
-                   '• ⭐ `.getdp` — Downlode Dp\n' +
-                   '• 👀 `.cinfo` — Get Channel Info\n' +
-                   '• 💾 `.save / send` — Status saver\n' +
-                   '• 🍭 `.yts` — Youtube search\n' +
-                   '• 📋 `.tiktoksearch` — tiktoksearch\n\n' +
- 
-                   '📥 *DOWNLOADERS*\n\n' +
-                   '• 🎧 `.song` — Download song\n' +
-                   '• 📂 `.csend` — Channel Song Send\n' +
-                   '• 🎥 `.tiktok` — TikTok video\n' +
-                   '• 📸 `.facebook`  — Video Facebook\n' +
-                   '• 🎬 `.video` — Video\n\n' + 
-                   '╭───────𓍯───────╮\n' +
-                   '▫️Mini Bot Web 🌐\n' +
-                   '> https://free-bot-site-six.vercel.app/\n' +
-                   '╰───────𓍯───────╯';                                    
-                    const footer = config.BOT_FOOTER;
+    const footer = config.BOT_FOOTER;
 
-                    await socket.sendMessage(sender, {
-                        image: { url: config.BUTTON_IMAGES.OWNER }, // Changed to MENU image
-                        caption: formatMessage(title, content, footer),
-                        buttons: [
-                            { buttonId: `${config.PREFIX}amenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴍᴀɪɴ ᴍᴇɴᴜ 🎛️' }, type: 1 },
-                            { buttonId: `${config.PREFIX}bmenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴅᴏᴡɴʟᴏᴀᴅ ᴍᴇɴᴜ 📥' }, type: 1 },
-                            { buttonId: `${config.PREFIX}cmenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ꜱᴘᴇᴄɪᴀʟ ᴍᴇɴᴜ 🧮' }, type: 1 },
-                            { buttonId: `${config.PREFIX}dmenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴏᴛʜᴇʀ ᴍᴇɴᴜ 📄' }, type: 1 }
-                        ],
-                        },  { quoted: adhimini });
-              
-                    break;
-                }
+    // 1️⃣ Original menu message with buttons
+    await socket.sendMessage(sender, {
+        image: { url: config.BUTTON_IMAGES.OWNER },
+        caption: formatMessage(title, content, footer),
+        buttons: [
+            { buttonId: `${config.PREFIX}amenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴍᴀɪɴ ᴍᴇɴᴜ 🎛️' }, type: 1 },
+            { buttonId: `${config.PREFIX}bmenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴅᴏᴡɴʟᴏᴀᴅ ᴍᴇɴᴜ 📥' }, type: 1 },
+            { buttonId: `${config.PREFIX}cmenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ꜱᴘᴇᴄɪᴀʟ ᴍᴇɴᴜ 🧮' }, type: 1 },
+            { buttonId: `${config.PREFIX}dmenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴏᴛʜᴇʀ ᴍᴇɴᴜ 📄' }, type: 1 }
+        ],
+    }, { quoted: adhimini });
+
+    // 2️⃣ Fake forward message
+    const fakeForward = { forwardingScore: 999, isForwarded: true }; // Forward style
+    const Podda = '*📢 Fake Forward Example*\nThis is a forwarded menu style message.';
+
+    const sentMsg = await socket.sendMessage(sender, {
+        image: { url: "https://files.catbox.moe/b7gyod.jpg" },
+        caption: Podda,
+        contextInfo: fakeForward,
+    }, {
+        quoted: adhimini
+    });
+
+    break;
+}
                 case 'amenu': {
                     const startTime = socketCreationTime.get(number) || Date.now();
                     const uptime = Math.floor((Date.now() - startTime) / 1000);
