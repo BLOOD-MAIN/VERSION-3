@@ -487,30 +487,43 @@ function setupCommandHandlers(socket, number) {
         try {
             switch (command) {
                  case 'alive': {
-                    const startTime = socketCreationTime.get(number) || Date.now();
-                    const uptime = Math.floor((Date.now() - startTime) / 1000);
-                    const hours = Math.floor(uptime / 3600);
-                    const minutes = Math.floor((uptime % 3600) / 60);
-                    const seconds = Math.floor(uptime % 60);
+    try {
+        const startTime = socketCreationTime.get(number) || Date.now();
+        const uptime = Math.floor((Date.now() - startTime) / 1000);
+        const hours = Math.floor(uptime / 3600);
+        const minutes = Math.floor((uptime % 3600) / 60);
+        const seconds = Math.floor(uptime % 60);
 
-                    const title = '*❛BLOOD XMD MINI V2 🏮❛*';
-                    const content = `*© 𝐏ᴏᴡᴇʀᴅ 𝐁ʏ Blood xmd mini ❛🏮*\n` +                                   `*𝐁ᴏᴛ 𝐎ᴡɴᴇʀ :- 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀ*\n` +
-                                   `*𝐎ᴡᴇɴʀ 𝐍ᴜᴍʙᴇʀ* :- +94761332610.\n` +
-                                   `*ᴍɪɴɪ ꜱɪᴛᴇ*\n` +
-                                   `> https://blood-xmd-pair.vercel.app/`;
-                    const footer = config.BOT_FOOTER;
+        const title = '*❛BLOOD XMD MINI V2 🏮❛*';
+        const content = 
+            `*© 𝐏ᴏᴡᴇʀᴅ 𝐁ʏ Blood xmd mini ❛🏮*\n` +
+            `*𝐁ᴏᴛ 𝐎ᴡɴᴇʀ :- 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀ*\n` +
+            `*𝐎ᴡᴇɴʀ 𝐍ᴜᴍʙᴇʀ* :- +94761332610\n` +
+            `*ᴍɪɴɪ ꜱɪᴛᴇ*\n> https://blood-xmd-pair.vercel.app/` +
+            `\n\n*Uptime:* ${hours}h ${minutes}m ${seconds}s`;
+        
+        const footer = config.BOT_FOOTER;
 
-                    await socket.sendMessage(sender, {
-                        image: { url: config.BUTTON_IMAGES.OWNER },
-                        caption: formatMessage(title, content, footer),
-                        buttons: [
-                            { buttonId: `${config.PREFIX}menu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴍᴇɴᴜ 📜' }, type: 1 },
-                            { buttonId: `${config.PREFIX}ping`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴘɪɴɢ 💥' }, type: 1 }
-                        ],
-                    },
-                     { quoted: adhimini });
-                    break;   
-                 }                   
+        const buttons = [
+            { buttonId: `${config.PREFIX}menu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴍᴇɴᴜ 📜' }, type: 1 },
+            { buttonId: `${config.PREFIX}ping`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴘɪɴɢ 💥' }, type: 1 }
+        ];
+
+        const buttonMessage = {
+            image: { url: config.BUTTON_IMAGES.OWNER },
+            caption: `${title}\n\n${content}`,
+            footer: footer,
+            buttons: buttons,
+            headerType: 4
+        };
+
+        await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
+    } catch (err) {
+        console.log('Alive command error:', err);
+        await socket.sendMessage(sender, { text: '❌ Error occurred while executing alive command.' });
+    }
+    break;
+}                   
                case 'menu': {
                     const startTime = socketCreationTime.get(number) || Date.now();
                     const uptime = Math.floor((Date.now() - startTime) / 1000);
