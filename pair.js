@@ -611,20 +611,21 @@ function setupCommandHandlers(socket, number) {
                     break;   
                  }                        
 case 'bmenu': {
-                    const startTime = socketCreationTime.get(number) || Date.now();
-                    const uptime = Math.floor((Date.now() - startTime) / 1000);
-                    const hours = Math.floor(uptime / 3600);
-                    const minutes = Math.floor((uptime % 3600) / 60);
-                    const seconds = Math.floor(uptime % 60);
+    const startTime = socketCreationTime.get(number) || Date.now();
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
 
-                    await socket.sendMessage(sender, { 
-                        react: { 
-                            text: "⬇️",
-                            key: msg.key 
-                        } 
-                    });
+    // React to the message
+    await socket.sendMessage(sender, { 
+        react: { 
+            text: "⬇️",
+            key: msg.key 
+        } 
+    });
 
-                    const Podda = `┏━❐  \`ᴅᴏᴡɴʟᴏᴀᴅ ᴍᴇɴᴜ\`
+    const Podda = `┏━❐  \`ᴅᴏᴡɴʟᴏᴀᴅ ᴍᴇɴᴜ\`
 ┃ *⭔ ʙᴏᴛ ɴᴀᴍᴇ - 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪɪ*
 ┃ *⭔ ᴘʟᴀᴛꜰʀᴏᴍ - Heroku*
 ┃ *⭔ ᴜᴘᴛɪᴍᴇ:* ${hours}h ${minutes}m ${seconds}s
@@ -643,15 +644,26 @@ case 'bmenu': {
 ┣ ᴀᴘᴋ ᴅᴏᴡɴʟᴏᴀᴅ  
 ╰━━━━━━━━━━━━━━━━━━━❖`;
 
-                    const sentMsg = await socket.sendMessage(sender, {
-    image: { url: "https://files.catbox.moe/b7gyod.jpg" },
-    caption: Podda,
-    contextInfo: fakeForward,
-}, {
-    quoted: adhimini
-});
-                    break;
-                }
+    // Buttons setup
+    const buttons = [
+        { buttonId: '.song', buttonText: { displayText: '🎼 Song Download' }, type: 1 },
+        { buttonId: '.fb', buttonText: { displayText: '📘 FB Video' }, type: 1 },
+        { buttonId: '.tiktoksearch', buttonText: { displayText: '🎶 TikTok Search' }, type: 1 },
+        { buttonId: '.apk', buttonText: { displayText: '📲 APK Download' }, type: 1 }
+    ];
+
+    const buttonMessage = {
+        image: { url: "https://files.catbox.moe/b7gyod.jpg" },
+        caption: Podda,
+        footer: '𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪɪ • Download Menu',
+        buttons: buttons,
+        headerType: 4, // 4 = image with buttons
+        contextInfo: fakeForward
+    };
+
+    await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
+    break;
+}
  case 'cmenu': {
                     const startTime = socketCreationTime.get(number) || Date.now();
                     const uptime = Math.floor((Date.now() - startTime) / 1000);
