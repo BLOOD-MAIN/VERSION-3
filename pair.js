@@ -1099,20 +1099,15 @@ await new Promise(resolve => setTimeout(resolve, 30000));
 case 'song': {
     try {
         const q = args.join(" ");
-        if (!q) {
-            return reply("*ඔයාලා ගීත නමක් හෝ YouTube ලින්ක් එකක් දෙන්න...!*");
-        }
+        if (!q) return reply("*ඔයාලා ගීත නමක් හෝ YouTube ලින්ක් එකක් දෙන්න...!*");
 
         const yts = require('yt-search');
         const search = await yts(q);
 
-        if (!search.videos.length) {
-            return reply("*ගීතය හමුනොවුණා... ❌*");
-        }
+        if (!search.videos.length) return reply("*ගීතය හමුනොවුණා... ❌*");
 
         const data = search.videos[0];
         const ytUrl = data.url;
-        const ago = data.ago;
 
         const api = `https://sadiya-tech-apis.vercel.app/download/ytdl?url=${ytUrl}&format=mp3&apikey=sadiya`;
         const { data: apiRes } = await axios.get(api);
@@ -1123,40 +1118,34 @@ case 'song': {
 
         const result = apiRes.result;
 
-        const caption = `╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸
-        
-*ℹ️ Title :* \`${data.title}\`
-*⏱️Duration :* ${data.timestamp} 
+        const caption = `*🎵 Title :* \`${data.title}\`
+*⏱ Duration :* ${data.timestamp}
 *🧬 Views :* ${data.views}
-📅 *Released Date :* ${data.ago}
- 
-╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸╸`;
+📅 *Released Date :* ${data.ago}`;
 
-        await socket.sendMessage(sender, {
+        // Buttons setup
+        const buttons = [
+            { buttonId: `doc_${ytUrl}`, buttonText: { displayText: '📄 Document' }, type: 1 },
+            { buttonId: `mp3_${ytUrl}`, buttonText: { displayText: '🎵 MP3' }, type: 1 },
+            { buttonId: `vn_${ytUrl}`, buttonText: { displayText: '🎙️ Voice Note' }, type: 1 }
+        ];
+
+        const buttonMessage = {
             image: { url: result.thumbnail },
             caption: caption,
-    contextInfo: fakeForward,
-}, {
-    quoted: adhimini
-});
-    
+            footer: '𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪɪ • Song Download',
+            buttons: buttons,
+            headerType: 4,
+            contextInfo: fakeForward
+        };
 
-        await socket.sendMessage(sender, {
-            audio: { url: result.download },
-            mimetype: "audio/mpeg",
-            ptt: false,
-          contextInfo: fakeForward,
-}, {
-    quoted: adhimini
-});
-  
+        await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
 
     } catch (e) {
         console.error(e);
         reply("*ඇතැම් දෝෂයකි! පසුව නැවත උත්සහ කරන්න.*");
     }
-break;
-
+    break;
 }
 
                 case 'ping': {
