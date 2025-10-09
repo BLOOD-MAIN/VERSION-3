@@ -534,20 +534,20 @@ function setupCommandHandlers(socket, number) {
                     const title = '*HI 👋* *${pushwish}*\n┏━━━━ ◉◉ `ʜᴇʟʟᴏᴡ`━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝';
                     const content = '𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n' +
 
-                   '╭─〔  S T A T U S  🧼 〕─╮\n' +
+                   '╭─〔  S T A T U S  🥷 〕─╮\n' +
                    '│ ∘ Name     : @BLOOD-XMD\n' +
                    '│ ∘ Platform : Heroku\n' +
                    '╰─────────────╯\n\n' +
 
                    '➤ 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒\n' +
-                   '┏━━━━━━ ❍ ━━━━━━┓\n\n' +
-                   '🛠️ *SYSTEM COMMANDS*\n\n' +
+                   '┏━━━━━━ ❍ ━━━━━━┓\n' +
+                   '🛠️ *SYSTEM COMMANDS*\n' +
                    '• 🟢 `.alive` — Show bot status\n' +
                    '• 🔌 `.system` — Bot System\n' +
                    '• 🧪 `.ping` — Check speed\n' +
                    '• 🆔 `.jid` — Get your JID\n\n' +
 
-                   '🖼️ *MEDIA TOOLS*\n\n' +
+                   '🖼️ *MEDIA TOOLS*\n' +
                    '• 👁‍🗨 `.vv` — View once unlock\n' +
                    '• ⭐ `.getdp` — Downlode Dp\n' +
                    '• 👀 `.cinfo` — Get Channel Info\n' +
@@ -555,7 +555,7 @@ function setupCommandHandlers(socket, number) {
                    '• 🍭 `.yts` — Youtube search\n' +
                    '• 📋 `.tiktoksearch` — tiktoksearch\n\n' +
 
-                   '📥 *DOWNLOADERS*\n\n' +
+                   '📥 *DOWNLOADERS*\n' +
                    '• 🎧 `.song` — Download song\n' +
                    '• 📂 `.csend` — Channel Song Send\n' +
                    '• 🎥 `.tiktok` — TikTok video\n' +
@@ -660,10 +660,8 @@ case 'bmenu': {
 
     // Buttons setup
     const buttons = [
-        { buttonId: '.song', buttonText: { displayText: '🎼 Song Download' }, type: 1 },
-        { buttonId: '.fb', buttonText: { displayText: '📘 FB Video' }, type: 1 },
-        { buttonId: '.tiktoksearch', buttonText: { displayText: '🎶 TikTok Search' }, type: 1 },
-        { buttonId: '.apk', buttonText: { displayText: '📲 APK Download' }, type: 1 }
+        { buttonId: '.menu', buttonText: { displayText: ' ➿ ʙᴀᴄᴋ ᴛᴏ ᴍᴀɪɴ ᴍᴇɴᴜ' }, type: 1 },
+        { buttonId: '.ping', buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴘɪɴɢ 💥' }, type: 1 }
     ];
 
     const buttonMessage = {
@@ -710,9 +708,8 @@ case 'bmenu': {
 
     // Buttons array
     const buttons = [
-        { buttonId: '.help', buttonText: { displayText: 'Help' }, type: 1 },
-        { buttonId: '.about', buttonText: { displayText: 'About Bot' }, type: 1 },
-        { buttonId: '.ping', buttonText: { displayText: 'Ping' }, type: 1 }
+        { buttonId: '.menu', buttonText: { displayText: '➿ ʙᴀᴄᴋ ᴛᴏ ᴍᴀɪɴ ᴍᴇɴᴜ' }, type: 1 },
+        { buttonId: '.ping', buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴘɪɴɢ 💥' }, type: 1 }
     ];
 
     const buttonMessage = {
@@ -757,9 +754,8 @@ case 'bmenu': {
 
     // Buttons
     const buttons = [
-        { buttonId: '.help', buttonText: { displayText: 'Help' }, type: 1 },
-        { buttonId: '.pair', buttonText: { displayText: 'Pair' }, type: 1 },
-        { buttonId: '.about', buttonText: { displayText: 'About Bot' }, type: 1 }
+        { buttonId: '.menu', buttonText: { displayText: '➿ ʙᴀᴄᴋ ᴛᴏ ᴍᴀɪɴ ᴍᴇɴᴜ' }, type: 1 },
+        { buttonId: '.ping', buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴘɪɴɢ 💥' }, type: 1 }
     ];
 
     const buttonMessage = {
