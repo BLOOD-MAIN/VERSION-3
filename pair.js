@@ -1126,56 +1126,71 @@ await new Promise(resolve => setTimeout(resolve, 30000));
     }
     break;
 }
-case 'song': {
-    try {
-        const q = args.join(" ");
-        if (!q) return reply("*ඔයාලා ගීත නමක් හෝ YouTube ලින්ක් එකක් දෙන්න...!*");
+case  'song': {
+  const { ytsearch } = require('@dark-yasiya/yt-dl.js');
+  const RPL = `💭😒 *Please provide a song name or YouTube link to search.*\n\n👨‍🔧 *Example:* \`.song Shape of You\``;
 
-        const yts = require('yt-search');
-        const search = await yts(q);
+  // Check if user gave arguments
+  if (!args[0]) {
+    return await socket.sendMessage(from, {
+      text: RPL
+    }, { quoted: msg });
+  }
 
-        if (!search.videos.length) return reply("*ගීතය හමුනොවුණා... ❌*");
+  const q = args.join(" ");
 
-        const data = search.videos[0];
-        const ytUrl = data.url;
+  try {
+    const yt = await ytsearch(q);
 
-        const api = `https://sadiya-tech-apis.vercel.app/download/ytdl?url=${ytUrl}&format=mp3&apikey=sadiya`;
-        const { data: apiRes } = await axios.get(api);
-
-        if (!apiRes?.status || !apiRes.result?.download) {
-            return reply("❌ ගීතය බාගත කළ නොහැක. වෙනත් එකක් උත්සහ කරන්න!");
-        }
-
-        const result = apiRes.result;
-
-        const caption = `*🎵 Title :* \`${data.title}\`
-*⏱ Duration :* ${data.timestamp}
-*🧬 Views :* ${data.views}
-📅 *Released Date :* ${data.ago}`;
-
-        // Buttons setup
-        const buttons = [
-            { buttonId: `doc_${ytUrl}`, buttonText: { displayText: '📄 Document' }, type: 1 },
-            { buttonId: `mp3_${ytUrl}`, buttonText: { displayText: '🎵 MP3' }, type: 1 },
-            { buttonId: `vn_${ytUrl}`, buttonText: { displayText: '🎙️ Voice Note' }, type: 1 }
-        ];
-
-        const buttonMessage = {
-            image: { url: result.thumbnail },
-            caption: caption,
-            footer: '𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪɪ • Song Download',
-            buttons: buttons,
-            headerType: 4,
-            contextInfo: fakeForward
-        };
-
-        await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
-
-    } catch (e) {
-        console.error(e);
-        reply("*ඇතැම් දෝෂයකි! පසුව නැවත උත්සහ කරන්න.*");
+    if (!yt || !yt.results || yt.results.length === 0) {
+      return reply("❌ *No results found. Try a different song title or link.*");
     }
-    break;
+
+    const song = yt.results[0];
+    const url = song.url;
+    const thumb = song.thumbnail;
+
+    const caption = `ʙʟᴏᴏᴅ x ᴍᴅ ᴍɪɴɪ ʙᴏᴛ ꜱᴏɴɢ ᴅᴏᴡɴʟᴏᴀᴅ 🎶
+
+*📋 тιттℓє ➟* ${song.title}
+*🏮 ∂υяαтιση ➟* ${song.timestamp}
+*👤 ¢яєαтσя ➟* ${song.author.name}
+*📎 ѕσηg υяℓ ➟* ${url}
+
+> 𝘉𝘓𝘖𝘖𝘋-𝘟-𝘔𝘋-𝘔𝘐𝘕𝘐-𝘉𝘖𝘛- 💚🔥`;
+
+    const templateButtons = [
+      {
+        buttonId: `${config.PREFIX}mp3play ${url}`,
+        buttonText: { displayText: 'ꜱᴏɴɢ ᴍᴘ3 🎶' },
+        type: 1,
+      },
+      {
+        buttonId: `${config.PREFIX}mp3doc ${url}`,
+        buttonText: { displayText: 'ꜱᴏɴɢ ᴅᴏᴄᴜᴍᴇɴᴛ 📂' },
+        type: 1,
+      },
+      {
+        buttonId: `${config.PREFIX}mp3ptt ${url}`,
+        buttonText: { displayText: 'ꜱᴏɴɢ ᴠᴏɪᴄᴇ ᴛᴘᴘ 🎤' },
+        type: 1
+      }
+    ];
+
+    await socket.sendMessage(from, {
+      image: { url: thumb },
+      caption: caption.trim(),
+      footer: '𝘉𝘓𝘖𝘖𝘋 𝘟 𝘔𝘋 𝘉𝘠 𝘚𝘈𝘊𝘏𝘐𝘛𝘏𝘙𝘈 𝘔𝘈𝘋𝘜𝘚𝘈𝘕𝘒𝘈👨‍🔧⚡',
+      buttons: templateButtons,
+      headerType: 1
+    }, { quoted: msg });
+
+  } catch (e) {
+    console.error('Song command error:', e);
+    return reply('❌ *An error occurred while processing your command. Please try again.*\n\n> *𝘉𝘓𝘖𝘖𝘋-𝘟-𝘔𝘋-𝘔𝘐𝘕𝘐-𝘉𝘖𝘛- 💚🔥*');
+  }
+
+  break;
 }
 
                 case 'ping': {
