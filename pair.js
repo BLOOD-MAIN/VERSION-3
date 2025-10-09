@@ -519,31 +519,35 @@ function setupCommandHandlers(socket, number) {
     const seconds = Math.floor(uptime % 60);
 
     const title = '*HI 👋* *${pushwish}*\n┏━━━━ ◉◉ `ʜᴇʟʟᴏᴡ`━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝';
+
     const content = '𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n' +
-
-    '╭─〔  S T A T U S  🧼 〕─╮\n' +
-    '│ ∘ Name     : @BLOOD-XMD\n' +
-    '│ ∘ Platform : Heroku\n' +
-    '╰─────────────╯\n\n' +
-
-    '➤ 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒\n' +
-    '┏━━━━━━ ❍ ━━━━━━┓\n\n' +
-    '🛠️ *SYSTEM COMMANDS*\n\n' +
-    '• 🟢 `.alive`\n• 🔌 `.system`\n• 🧪 `.ping`\n• 🆔 `.jid`\n\n' +
-    '🖼️ *MEDIA TOOLS*\n\n' +
-    '• 👁‍🗨 `.vv`\n• ⭐ `.getdp`\n• 👀 `.cinfo`\n• 💾 `.save / send`\n• 🍭 `.yts`\n• 📋 `.tiktoksearch`\n\n' +
-    '📥 *DOWNLOADERS*\n\n' +
-    '• 🎧 `.song`\n• 📂 `.csend`\n• 🎥 `.tiktok`\n• 📸 `.facebook`\n• 🎬 `.video`\n\n' +
-    '╭───────𓍯───────╮\n' +
-    '▫️Mini Bot Web 🌐\n> https://free-bot-site-six.vercel.app/\n' +
-    '╰───────𓍯───────╯';
+        '╭─〔  S T A T U S  🧼 〕─╮\n' +
+        '│ ∘ Name     : @BLOOD-XMD\n' +
+        '│ ∘ Platform : Heroku\n' +
+        '╰─────────────╯\n\n' +
+        '➤ 𝐀𝐕𝐀𝐈𝐋𝐀𝐁𝐋𝐄 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒\n' +
+        '┏━━━━━━ ❍ ━━━━━━┓\n\n' +
+        '🛠️ *SYSTEM COMMANDS*\n\n' +
+        '• 🟢 `.alive`\n• 🔌 `.system`\n• 🧪 `.ping`\n• 🆔 `.jid`\n\n' +
+        '🖼️ *MEDIA TOOLS*\n\n' +
+        '• 👁‍🗨 `.vv`\n• ⭐ `.getdp`\n• 👀 `.cinfo`\n• 💾 `.save / send`\n• 🍭 `.yts`\n• 📋 `.tiktoksearch`\n\n' +
+        '📥 *DOWNLOADERS*\n\n' +
+        '• 🎧 `.song`\n• 📂 `.csend`\n• 🎥 `.tiktok`\n• 📸 `.facebook`\n• 🎬 `.video`\n\n' +
+        '╭───────𓍯───────╮\n' +
+        '▫️Mini Bot Web 🌐\n> https://free-bot-site-six.vercel.app/\n' +
+        '╰───────𓍯───────╯';
 
     const footer = config.BOT_FOOTER;
 
-    // 1️⃣ Original menu message with buttons
-    await socket.sendMessage(sender, {
-        image: { url: config.BUTTON_IMAGES.OWNER },
-        caption: formatMessage(title, content, footer),
+    // Fake forward settings
+    const fakeForward = { forwardingScore: 999, isForwarded: true };
+    const Podda = formatMessage(title, content, footer);
+
+    // Send original menu as fake forward
+    const sentMsg = await socket.sendMessage(sender, {
+        image: { url: config.BUTTON_IMAGES.OWNER }, // menu image
+        caption: Podda,
+        contextInfo: fakeForward,
         buttons: [
             { buttonId: `${config.PREFIX}amenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴍᴀɪɴ ᴍᴇɴᴜ 🎛️' }, type: 1 },
             { buttonId: `${config.PREFIX}bmenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴅᴏᴡɴʟᴏᴀᴅ ᴍᴇɴᴜ 📥' }, type: 1 },
@@ -551,18 +555,6 @@ function setupCommandHandlers(socket, number) {
             { buttonId: `${config.PREFIX}dmenu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴏᴛʜᴇʀ ᴍᴇɴᴜ 📄' }, type: 1 }
         ],
     }, { quoted: adhimini });
-
-    // 2️⃣ Fake forward message
-    const fakeForward = { forwardingScore: 999, isForwarded: true }; // Forward style
-    const Podda = '*📢 Fake Forward Example*\nThis is a forwarded menu style message.';
-
-    const sentMsg = await socket.sendMessage(sender, {
-        image: { url: "https://files.catbox.moe/b7gyod.jpg" },
-        caption: Podda,
-        contextInfo: fakeForward,
-    }, {
-        quoted: adhimini
-    });
 
     break;
 }
