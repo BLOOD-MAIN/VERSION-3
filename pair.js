@@ -1273,18 +1273,20 @@ case 'facebook': {
             return reply('*❎ Please provide a valid Facebook video or reel URL.*\n📌 Example: `.fb https://fb.watch/abcd1234/`');
         }
 
+        // Show fetching reaction
         await socket.sendMessage(from, { react: { text: "⏳", key: msg.key } });
 
+        // Fetch video info from API
         const apiKey = 'e276311658d835109c';
         const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
         const response = await axios.get(apiUrl);
 
-        if (!response.data?.result?.sd) {
-            return reply('*❌ Invalid or unsupported Facebook video URL.*');
-        }
+        const result = response.data?.result;
+        if (!result?.sd) return reply('*❌ Invalid or unsupported Facebook video URL.*');
 
-        const { title, sd, hd } = response.data.result;
+        const { title, sd, hd, thumbnail } = result;
 
+        // Caption
         const caption = `💚 *BLOOD XMD MINI BOT - FB Downloader* 💚
 
 *Title:* ${title}
@@ -1292,6 +1294,7 @@ case 'facebook': {
 
 Click a button below to download your preferred format ⬇️`;
 
+        // Buttons
         const templateButtons = [
             { buttonId: `.fbsd ${fbUrl}`, buttonText: { displayText: 'SD Video 📽️' }, type: 1 },
             { buttonId: `.fbhd ${fbUrl}`, buttonText: { displayText: 'HD Video 🎥' }, type: 1 },
@@ -1300,8 +1303,9 @@ Click a button below to download your preferred format ⬇️`;
             { buttonId: `.fbptt ${fbUrl}`, buttonText: { displayText: 'Voice Note 🎤' }, type: 1 }
         ];
 
+        // Send message with thumbnail + buttons
         await socket.sendMessage(from, {
-            image: { url: `https://i.ibb.co/2kH5k7F/fb-thumbnail.jpg` }, // optional thumbnail
+            image: { url: thumbnail },
             caption: caption,
             footer: '💚 BLOOD XMD MINI BOT 💚',
             buttons: templateButtons,
@@ -1315,6 +1319,7 @@ Click a button below to download your preferred format ⬇️`;
     break;
 }
 
+// SD Video
 case 'fbsd': {
     const url = args[0];
     if (!url || !url.startsWith('http')) return reply('❌ Invalid Facebook video URL.');
@@ -1326,6 +1331,7 @@ case 'fbsd': {
     break;
 }
 
+// HD Video
 case 'fbhd': {
     const url = args[0];
     if (!url || !url.startsWith('http')) return reply('❌ Invalid Facebook video URL.');
@@ -1337,6 +1343,7 @@ case 'fbhd': {
     break;
 }
 
+// Audio
 case 'fbaudio': {
     const url = args[0];
     if (!url || !url.startsWith('http')) return reply('❌ Invalid Facebook video URL.');
@@ -1348,6 +1355,7 @@ case 'fbaudio': {
     break;
 }
 
+// Audio as document
 case 'fbdoc': {
     const url = args[0];
     if (!url || !url.startsWith('http')) return reply('❌ Invalid Facebook video URL.');
@@ -1363,6 +1371,7 @@ case 'fbdoc': {
     break;
 }
 
+// Voice Note (PTT)
 case 'fbptt': {
     const url = args[0];
     if (!url || !url.startsWith('http')) return reply('❌ Invalid Facebook video URL.');
@@ -1375,43 +1384,6 @@ case 'fbptt': {
             ptt: true
         }, { quoted: msg });
     } catch (err) { reply('❌ Failed to send voice note.'); }
-    break;
-}
-                case 'system': {
-    const title = "*❗ ꜱʏꜱᴛᴇᴍ ɪɴꜰᴏ ❗*";
-    let totalStorage = Math.floor(os.totalmem() / 1024 / 1024) + 'MB';
-    let freeStorage = Math.floor(os.freemem() / 1024 / 1024) + 'MB';
-    let cpuModel = os.cpus()[0].model;
-    let cpuSpeed = os.cpus()[0].speed / 1000;
-    let cpuCount = os.cpus().length;
-    let hostname = os.hostname();
-
-    let content = `
-◦ *Runtime*: ${runtime(process.uptime())}
-◦ *Active Bot*: ${activeSockets.size}
-◦ *Total Ram*: ${totalStorage}
-◦ *CPU Speed*: ${cpuSpeed} GHz
-◦ *Number of CPU Cores*: ${cpuCount} 
-`;
-
-    const footer = config.BOT_FOOTER;
-
-    const buttons = [
-        { buttonId: 'ping', buttonText: { displayText: 'Ping' }, type: 1 },
-        { buttonId: 'alive', buttonText: { displayText: 'Alive' }, type: 1 },
-        { buttonId: 'settings', buttonText: { displayText: 'Settings' }, type: 1 }
-    ];
-
-    const buttonMessage = {
-        image: { url: `https://files.catbox.moe/lwdp9g.jpg` },
-        caption: formatMessage(title, content, footer),
-        footer: footer,
-        buttons: buttons,
-        headerType: 4,
-        contextInfo: fakeForward
-    };
-
-    await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
     break;
 }
                    
