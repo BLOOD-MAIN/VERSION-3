@@ -1129,29 +1129,15 @@ await new Promise(resolve => setTimeout(resolve, 30000));
 case 'song': {
   try {
     const q = args.join(" ");
-    if (!q) {
-      return reply("💭😒 *ඔයාට ගීත නමක් හෝ YouTube ලින්ක් එකක් දාන්න පුළුවන්...!* 🎵\n\n👨‍🔧 *උදාහරණය:* \n`.song Shape of You`");
-    }
+    if (!q) return reply("💭😒 *ඔයාලා ගීත නමක් හෝ YouTube link එකක් දෙන්න...!* 🎵\n\n👨‍🔧 *උදාහරණය:* \n`.song Shape of You`");
 
     const yts = require('yt-search');
     const search = await yts(q);
 
-    if (!search.videos.length) {
-      return reply("❌ *ගීතය හමුනොවුණා... වෙනත් එකක් උත්සහ කරන්න!*");
-    }
+    if (!search.videos.length) return reply("❌ *ගීතය හමුනොවුණා... වෙනත් එකක් උත්සහ කරන්න!*");
 
     const data = search.videos[0];
     const ytUrl = data.url;
-    const apiUrl = `https://sadiya-tech-apis.vercel.app/download/ytdl?url=${ytUrl}&format=mp3&apikey=sadiya`;
-
-    const { data: apiRes } = await axios.get(apiUrl);
-
-    if (!apiRes?.status || !apiRes.result?.download) {
-      return reply("❌ *ගීතය බාගත කළ නොහැක. වෙනත් එකක් උත්සහ කරන්න!*");
-    }
-
-    const result = apiRes.result;
-    const thumb = result.thumbnail;
 
     const caption = `🎶 *ʙʟᴏᴏᴅ x ᴍᴅ ᴍɪɴɪ ʙᴏᴛ ꜱᴏɴɢ ᴅᴏᴡɴʟᴏᴀᴅ* 🎧
 
@@ -1166,44 +1152,84 @@ case 'song': {
     const buttons = [
       {
         buttonId: `${config.PREFIX}mp3play ${ytUrl}`,
-        buttonText: { displayText: '🎵 MP3 ගීතය ධාවනය කරන්න' },
-        type: 1
+        buttonText: { displayText: '🎵 MP3 PLAY' },
+        type: 1,
       },
       {
         buttonId: `${config.PREFIX}mp3doc ${ytUrl}`,
-        buttonText: { displayText: '📂 MP3 Document එකක් ලෙස' },
-        type: 1
+        buttonText: { displayText: '📂 MP3 DOCUMENT' },
+        type: 1,
       },
       {
         buttonId: `${config.PREFIX}mp3ptt ${ytUrl}`,
-        buttonText: { displayText: '🎤 Voice Track එකක් ලෙස' },
-        type: 1
-      }
+        buttonText: { displayText: '🎤 VOICE TRACK' },
+        type: 1,
+      },
     ];
 
-    // Send Song Info Card
-    await socket.sendMessage(sender, {
-      image: { url: thumb },
-      caption: caption,
+    await socket.sendMessage(from, {
+      image: { url: data.thumbnail },
+      caption,
       footer: '🧠 BLOOD XMD MINI BOT ⚡ By Sachithra Madusanka',
       buttons,
       headerType: 1,
       contextInfo: fakeForward
-    }, { quoted: adhimini });
-
-    // Send Audio File
-    await socket.sendMessage(sender, {
-      audio: { url: result.download },
-      mimetype: "audio/mpeg",
-      ptt: false,
-      contextInfo: fakeForward
-    }, { quoted: adhimini });
+    }, { quoted: msg });
 
   } catch (e) {
-    console.error('Song Command Error:', e);
-    reply("⚠️ *දෝෂයක් ඇතිවිය! කරුණාකර පසුව නැවත උත්සාහ කරන්න.*");
+    console.error(e);
+    reply("⚠️ *දෝෂයක් ඇතිවිය! පසුව නැවත උත්සාහ කරන්න.*");
   }
+  break;
+}
 
+// =============================
+// 🔊 MP3 Button Commands
+// =============================
+
+case 'mp3play':
+case 'mp3doc':
+case 'mp3ptt': {
+  try {
+    const ytUrl = args[0];
+    if (!ytUrl) return reply("❌ *YouTube link එකක් දාන්න!*");
+
+    const apiUrl = `https://sadiya-tech-apis.vercel.app/download/ytdl?url=${ytUrl}&format=mp3&apikey=sadiya`;
+    const { data: apiRes } = await axios.get(apiUrl);
+
+    if (!apiRes?.status || !apiRes.result?.download)
+      return reply("❌ *ගීතය බාගත කළ නොහැක. වෙනත් එකක් උත්සහ කරන්න!*");
+
+    const result = apiRes.result;
+
+    if (command === 'mp3play') {
+      await socket.sendMessage(from, {
+        audio: { url: result.download },
+        mimetype: 'audio/mpeg',
+        ptt: false,
+        contextInfo: fakeForward,
+      }, { quoted: msg });
+    } else if (command === 'mp3doc') {
+      await socket.sendMessage(from, {
+        document: { url: result.download },
+        mimetype: 'audio/mpeg',
+        fileName: `${result.title}.mp3`,
+        caption: `🎧 ${result.title}`,
+        contextInfo: fakeForward,
+      }, { quoted: msg });
+    } else if (command === 'mp3ptt') {
+      await socket.sendMessage(from, {
+        audio: { url: result.download },
+        mimetype: 'audio/mpeg',
+        ptt: true,
+        contextInfo: fakeForward,
+      }, { quoted: msg });
+    }
+
+  } catch (e) {
+    console.error(e);
+    reply("⚠️ *දෝෂයක් ඇතිවිය! පසුව නැවත උත්සාහ කරන්න.*");
+  }
   break;
 }
 
