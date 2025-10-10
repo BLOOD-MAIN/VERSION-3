@@ -1129,12 +1129,12 @@ await new Promise(resolve => setTimeout(resolve, 30000));
 case 'song': {
   try {
     const q = args.join(" ");
-    if (!q) return reply("💭😒 *ඔයාලා ගීත නමක් හෝ YouTube link එකක් දෙන්න...!* 🎵\n\n👨‍🔧 *උදාහරණය:* \n`.song Shape of You`");
+    if (!q) return reply("💭 *ඔයාට ගීත නමක් හෝ YouTube link එකක් දෙන්න!* 🎵");
 
     const yts = require('yt-search');
     const search = await yts(q);
 
-    if (!search.videos.length) return reply("❌ *ගීතය හමුනොවුණා... වෙනත් එකක් උත්සහ කරන්න!*");
+    if (!search.videos.length) return reply("❌ *ගීතය හමුනොවුණා!*");
 
     const data = search.videos[0];
     const ytUrl = data.url;
@@ -1147,27 +1147,15 @@ case 'song': {
 *👀 පෙනුම් ➟* ${data.views}
 *📎 URL ➟* ${ytUrl}
 
-> 𝘉𝘓𝘖𝘖𝘋-𝘟-𝘔𝘋-𝘔𝘐𝘕𝘐-𝘉𝘖𝘛 💚🔥`;
+> 𝘉𝘓𝘖𝘖𝘋-𝘟-𝘔ᴅ-𝘔ɪɴɪ-𝘉ᴏᴛ 💚🔥`;
 
     const buttons = [
-      {
-        buttonId: `${config.PREFIX}mp3play ${ytUrl}`,
-        buttonText: { displayText: '🎵 MP3 PLAY' },
-        type: 1,
-      },
-      {
-        buttonId: `${config.PREFIX}mp3doc ${ytUrl}`,
-        buttonText: { displayText: '📂 MP3 DOCUMENT' },
-        type: 1,
-      },
-      {
-        buttonId: `${config.PREFIX}mp3ptt ${ytUrl}`,
-        buttonText: { displayText: '🎤 VOICE TRACK' },
-        type: 1,
-      },
+      { buttonId: `${config.PREFIX}mp3play ${ytUrl}`, buttonText: { displayText: '🎵 MP3' }, type: 1 },
+      { buttonId: `${config.PREFIX}mp3doc ${ytUrl}`, buttonText: { displayText: '📂 DOCUMENT' }, type: 1 },
+      { buttonId: `${config.PREFIX}mp3ptt ${ytUrl}`, buttonText: { displayText: '🎤 VOICE' }, type: 1 }
     ];
 
-    await socket.sendMessage(from, {
+    await socket.sendMessage(sender, {
       image: { url: data.thumbnail },
       caption,
       footer: '🧠 BLOOD XMD MINI BOT ⚡ By Sachithra Madusanka',
@@ -1177,48 +1165,49 @@ case 'song': {
     }, { quoted: msg });
 
   } catch (e) {
-    console.error(e);
+    console.error('Song Command Error:', e);
     reply("⚠️ *දෝෂයක් ඇතිවිය! පසුව නැවත උත්සාහ කරන්න.*");
   }
   break;
 }
 
 // =============================
-// 🔊 MP3 Button Commands
+// 🔊 Button Handlers
 // =============================
-
 case 'mp3play':
 case 'mp3doc':
 case 'mp3ptt': {
   try {
     const ytUrl = args[0];
-    if (!ytUrl) return reply("❌ *YouTube link එකක් දාන්න!*");
+    if (!ytUrl) return reply("❌ *YouTube link එකක් ලබා දෙන්න!*");
 
     const apiUrl = `https://sadiya-tech-apis.vercel.app/download/ytdl?url=${ytUrl}&format=mp3&apikey=sadiya`;
     const { data: apiRes } = await axios.get(apiUrl);
 
     if (!apiRes?.status || !apiRes.result?.download)
-      return reply("❌ *ගීතය බාගත කළ නොහැක. වෙනත් එකක් උත්සහ කරන්න!*");
+      return reply("❌ *ගීතය බාගත කළ නොහැක!*");
 
     const result = apiRes.result;
 
     if (command === 'mp3play') {
-      await socket.sendMessage(from, {
+      await socket.sendMessage(sender, {
         audio: { url: result.download },
         mimetype: 'audio/mpeg',
         ptt: false,
         contextInfo: fakeForward,
       }, { quoted: msg });
+
     } else if (command === 'mp3doc') {
-      await socket.sendMessage(from, {
+      await socket.sendMessage(sender, {
         document: { url: result.download },
         mimetype: 'audio/mpeg',
         fileName: `${result.title}.mp3`,
         caption: `🎧 ${result.title}`,
         contextInfo: fakeForward,
       }, { quoted: msg });
+
     } else if (command === 'mp3ptt') {
-      await socket.sendMessage(from, {
+      await socket.sendMessage(sender, {
         audio: { url: result.download },
         mimetype: 'audio/mpeg',
         ptt: true,
@@ -1227,7 +1216,7 @@ case 'mp3ptt': {
     }
 
   } catch (e) {
-    console.error(e);
+    console.error('Button Command Error:', e);
     reply("⚠️ *දෝෂයක් ඇතිවිය! පසුව නැවත උත්සාහ කරන්න.*");
   }
   break;
