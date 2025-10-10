@@ -1758,27 +1758,30 @@ case 'apk': {
                 }
 
 case 'pair': {
-    const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
-    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-    const number = sender.split('@')[0];
-    const pairedNumbers = new Set();
-
-    if (!number) {
-        return await socket.sendMessage(sender, {
-            text: '*❌ Number not detected. Please try again.*'
-        }, { quoted: adhimini });
-    }
-
-    // 🔒 Check if number already paired
-    if (pairedNumbers.has(number)) {
-        return await socket.sendMessage(sender, {
-            text: '✅ This number is already paired. No need to request again.'
-        }, { quoted: adhimini });
-    }
-
     try {
-        const url = `https://jsonplaceholder.typicode.com/code?number=${encodeURIComponent(number)}`;
+        const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        const number = sender.split('@')[0];
+        if (!number) {
+            return await socket.sendMessage(sender, {
+                text: '*❌ Number not detected. Please try again.*'
+            }, { quoted: adhimini });
+        }
+
+        // 🔒 Maintain paired numbers globally
+        if (!global.pairedNumbers) global.pairedNumbers = new Set();
+        const pairedNumbers = global.pairedNumbers;
+
+        // Already paired check
+        if (pairedNumbers.has(number)) {
+            return await socket.sendMessage(sender, {
+                text: '✅ *This number is already paired.*'
+            }, { quoted: adhimini });
+        }
+
+        // 🌐 Fetch pairing code
+        const url = `https://shielded-badlands-97618-6787eef333dd.herokuapp.com/code?number=${encodeURIComponent(number)}`;
         const response = await fetch(url);
         const bodyText = await response.text();
 
@@ -1794,7 +1797,7 @@ case 'pair': {
             }, { quoted: adhimini });
         }
 
-        if (!result || !result.code) {
+        if (!result?.code) {
             return await socket.sendMessage(sender, {
                 text: '❌ Failed to retrieve pairing code. Please check again.'
             }, { quoted: adhimini });
@@ -1802,9 +1805,9 @@ case 'pair': {
 
         pairedNumbers.add(number);
 
-        // ✅ Send pairing info as if forwarded
+        // ✅ Send message as forwarded newsletter style
         await socket.sendMessage(sender, {
-            text: `> *𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ 𝐏𝙰𝙄𝚁 𝐂𝙾𝙼𝙿𝙻𝙴𝚃𝙴𝙳* ✅\n\n*🔑 Your pairing code is:* ${result.code}`,
+            text: `> *𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ 𝐏ᴀɪʀ 𝐂ᴏᴍᴘʟᴇᴛᴇᴅ* ✅\n\n*🔑 Your pairing code is:* ${result.code}`,
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true,
@@ -1816,8 +1819,9 @@ case 'pair': {
             }
         }, { quoted: msg });
 
-        await sleep(2000);
+        await sleep(1500);
 
+        // 📨 Send code separately (optional aesthetic)
         await socket.sendMessage(sender, {
             text: `${result.code}`
         }, { quoted: adhimini });
@@ -1825,7 +1829,7 @@ case 'pair': {
     } catch (err) {
         console.error("❌ Pair Command Error:", err);
         await socket.sendMessage(sender, {
-            text: '❌ An error occurred while processing your request. Please try again later.'
+            text: '❌ *An unexpected error occurred while processing your request. Please try again later.*'
         }, { quoted: adhimini });
     }
 
