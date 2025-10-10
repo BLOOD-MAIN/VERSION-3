@@ -1270,81 +1270,44 @@ case 'mp3ptt': {
 case 'fb':
 case 'fbdl':
 case 'facebook': {
-    const fbUrl = args.join(" ");
-    if (!fbUrl || !fbUrl.startsWith('http')) {
-        return reply('❎ Please provide a valid Facebook video URL.');
-    }
-
     try {
-        await socket.sendMessage(from, { react: { text: "⏳", key: msg.key } });
+        const fbUrl = args.join(" ");
+        if (!fbUrl) {
+            return reply('*𝐏ℓєαʂє 𝐏ɼ๏νιɖє 𝐀 fb҇ 𝐕ιɖє๏ ๏ɼ ɼєℓ 𝐔ɼℓ..*');
+        }
 
         const apiKey = 'e276311658d835109c';
         const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
         const response = await axios.get(apiUrl);
 
-        if (!response.data?.result) return reply('❌ Unable to fetch video info.');
+        if (!response.data || !response.data.result || !response.data.result.sd) {
+            return reply('*❌ Invalid or unsupported Facebook video URL.*');
+        }
 
-        const { title, thumbnail, sd, hd } = response.data.result;
+        const { title, desc, sd, hd, audio, thumbnail } = response.data.result;
 
-        const caption = `💚 *BLOOD XMD MINI FB DOWNLOADER* 💚\n\n*Title:* ${title}\n*URL:* ${fbUrl}\n\nSelect an option below 👇`;
-
+        // Buttons array
         const buttons = [
-            { buttonId: `.fbsd ${fbUrl}`, buttonText: { displayText: 'SD Video 📽️' }, type: 1 },
-            { buttonId: `.fbhd ${fbUrl}`, buttonText: { displayText: 'HD Video 🎥' }, type: 1 },
-            { buttonId: `.fbaudio ${fbUrl}`, buttonText: { displayText: 'Audio 🎵' }, type: 1 },
-            { buttonId: `.fbdoc ${fbUrl}`, buttonText: { displayText: 'Audio Doc 📂' }, type: 1 },
-            { buttonId: `.fbptt ${fbUrl}`, buttonText: { displayText: 'Voice Note 🎤' }, type: 1 }
+            { buttonId: `.fbsd ${fbUrl}`, buttonText: { displayText: 'ꜱᴅ ᴠɪᴅᴇᴏ 📽️' }, type: 1 },
+            { buttonId: `.fbhd ${fbUrl}`, buttonText: { displayText: 'ʜᴅ ᴠɪᴅᴇᴏ 🎥' }, type: 1 },
+            { buttonId: `.fbaudio ${fbUrl}`, buttonText: { displayText: 'ᴀᴜᴅɪᴏ 🎵' }, type: 1 },
+            { buttonId: `.fbdoc ${fbUrl}`, buttonText: { displayText: 'ᴀᴜᴅɪᴏ ᴅᴏᴄ 📂' }, type: 1 },
+            { buttonId: `.fbptt ${fbUrl}`, buttonText: { displayText: 'ᴠᴏɪᴄᴇ ɴᴏᴛᴇ 🎤' }, type: 1 }
         ];
 
-        await socket.sendMessage(from, {
-            image: { url: thumbnail },
-            caption: caption,
-            footer: '💚 BLOOD XMD MINI FB DOWNLOADER 💚',
+        // Send button message with snapshot
+        await socket.sendMessage(sender, {
+            image: { url: thumbnail || sd }, // API thumbnail or fallback to SD video
+            caption: `*❒🚀 Anlgle Mini Fb Video Dl 🚀❒*\n\n${title}\n${desc || ''}`,
+            footer: 'BLOOD-XMD MINI BOT',
             buttons: buttons,
-            headerType: 4
-        }, { quoted: msg });
+            headerType: 4, // image + buttons
+            contextInfo: fakeForward
+        }, { quoted: adhimini });
 
-    } catch (err) {
-        console.error(err);
-        reply('❌ Error: Unable to download Facebook video.');
-    }
-    break;
-}
-
-case 'fbsd':
-case 'fbhd':
-case 'fbaudio':
-case 'fbdoc':
-case 'fbptt': {
-    const fbUrl = args[0];
-    if (!fbUrl || !fbUrl.startsWith('http')) return reply('❌ Invalid Facebook video URL.');
-
-    try {
-        const apiKey = 'e276311658d835109c';
-        const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
-        const res = await axios.get(apiUrl);
-        const data = res.data.result;
-
-        switch (command) {
-            case 'fbsd':
-                await socket.sendMessage(from, { video: { url: data.sd }, caption: '💚 SD Video' }, { quoted: msg });
-                break;
-            case 'fbhd':
-                await socket.sendMessage(from, { video: { url: data.hd || data.sd }, caption: '💚 HD Video' }, { quoted: msg });
-                break;
-            case 'fbaudio':
-                await socket.sendMessage(from, { audio: { url: data.sd }, mimetype: 'audio/mpeg' }, { quoted: msg });
-                break;
-            case 'fbdoc':
-                await socket.sendMessage(from, { document: { url: data.sd }, mimetype: 'audio/mpeg', fileName: 'FB_Audio.mp3' }, { quoted: msg });
-                break;
-            case 'fbptt':
-                await socket.sendMessage(from, { audio: { url: data.sd }, mimetype: 'audio/mpeg', ptt: true }, { quoted: msg });
-                break;
-        }
-    } catch (err) {
-        console.error(err);
-        reply('❌ Failed to fetch requested media.');
+    } catch (error) {
+        console.error('Error downloading Facebook video:', error);
+        reply('❌ Unable to download the Facebook video. Please try again later.');
     }
     break;
 }
