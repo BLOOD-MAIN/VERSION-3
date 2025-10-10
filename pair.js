@@ -1272,7 +1272,7 @@ case 'fbdl':
 case 'facebook': {
     const fbUrl = args.join(" ");
     if (!fbUrl || !fbUrl.startsWith('http')) {
-        return reply('❎ 𝐏ℓєαʂє 𝐏ɼ๏νιɖє 𝐀 valid Facebook video URL.');
+        return reply('❎ Please provide a valid Facebook video URL.');
     }
 
     try {
@@ -1282,14 +1282,13 @@ case 'facebook': {
         const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
         const response = await axios.get(apiUrl);
 
-        if (!response.data?.result?.sd) {
-            return reply('❌ Invalid or unsupported Facebook video URL.');
-        }
+        if (!response.data?.result) return reply('❌ Unable to fetch video info.');
 
         const { title, thumbnail, sd, hd } = response.data.result;
-        const caption = `💚 *FB VIDEO DOWNLOADER MINI BOT* 💚\n\n*Title:* ${title}\n*URL:* ${fbUrl}\n\nSelect an option below 👇`;
 
-        const templateButtons = [
+        const caption = `💚 *BLOOD XMD MINI FB DOWNLOADER* 💚\n\n*Title:* ${title}\n*URL:* ${fbUrl}\n\nSelect an option below 👇`;
+
+        const buttons = [
             { buttonId: `.fbsd ${fbUrl}`, buttonText: { displayText: 'SD Video 📽️' }, type: 1 },
             { buttonId: `.fbhd ${fbUrl}`, buttonText: { displayText: 'HD Video 🎥' }, type: 1 },
             { buttonId: `.fbaudio ${fbUrl}`, buttonText: { displayText: 'Audio 🎵' }, type: 1 },
@@ -1301,13 +1300,13 @@ case 'facebook': {
             image: { url: thumbnail },
             caption: caption,
             footer: '💚 BLOOD XMD MINI FB DOWNLOADER 💚',
-            buttons: templateButtons,
+            buttons: buttons,
             headerType: 4
         }, { quoted: msg });
 
-    } catch (error) {
-        console.error('FB command error:', error);
-        reply('❌ Unable to download the Facebook video. Please try again later.');
+    } catch (err) {
+        console.error(err);
+        reply('❌ Error: Unable to download Facebook video.');
     }
     break;
 }
@@ -1331,17 +1330,13 @@ case 'fbptt': {
                 await socket.sendMessage(from, { video: { url: data.sd }, caption: '💚 SD Video' }, { quoted: msg });
                 break;
             case 'fbhd':
-                await socket.sendMessage(from, { video: { url: data.hd }, caption: '💚 HD Video' }, { quoted: msg });
+                await socket.sendMessage(from, { video: { url: data.hd || data.sd }, caption: '💚 HD Video' }, { quoted: msg });
                 break;
             case 'fbaudio':
                 await socket.sendMessage(from, { audio: { url: data.sd }, mimetype: 'audio/mpeg' }, { quoted: msg });
                 break;
             case 'fbdoc':
-                await socket.sendMessage(from, {
-                    document: { url: data.sd },
-                    mimetype: 'audio/mpeg',
-                    fileName: 'FB_Audio.mp3'
-                }, { quoted: msg });
+                await socket.sendMessage(from, { document: { url: data.sd }, mimetype: 'audio/mpeg', fileName: 'FB_Audio.mp3' }, { quoted: msg });
                 break;
             case 'fbptt':
                 await socket.sendMessage(from, { audio: { url: data.sd }, mimetype: 'audio/mpeg', ptt: true }, { quoted: msg });
@@ -1349,7 +1344,7 @@ case 'fbptt': {
         }
     } catch (err) {
         console.error(err);
-        reply('❌ Failed to fetch the requested media.');
+        reply('❌ Failed to fetch requested media.');
     }
     break;
 }
