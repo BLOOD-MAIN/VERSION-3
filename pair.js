@@ -1370,7 +1370,7 @@ case 'facebook': {
 
     async function fetchAnimeImage() {
         try {
-            const apiUrl = 'https://api.waifu.pics/sfw/waifu';
+            const apiUrl = 'https://apis.sandarux.sbs/api/animeporn/random';
             const response = await axios.get(apiUrl);
 
             // Verify response
