@@ -1480,7 +1480,7 @@ case 'anime_download': {
     let apiUrl = '';
     let captionText = '';
 
-    // Decide API endpoint based on category
+    // Decide API endpoint
     if (category === 'waifu') {
         apiUrl = 'https://api.waifu.pics/sfw/waifu';
         captionText = '💖 Here is your Waifu!';
@@ -1499,6 +1499,7 @@ case 'anime_download': {
     }
 
     try {
+        // Fetch image
         const res = await fetch(apiUrl);
         const data = await res.json();
 
@@ -1506,19 +1507,26 @@ case 'anime_download': {
             return await socket.sendMessage(from, { text: '❌ Failed to fetch image. Try again.' }, { quoted: msg });
         }
 
+        // Buttons
         const buttons = [
             { buttonId: '.anime waifu', buttonText: { displayText: '💖 Waifu' }, type: 1 },
             { buttonId: '.anime neko', buttonText: { displayText: '🐱 Neko' }, type: 1 },
             { buttonId: '.anime nsfwneko', buttonText: { displayText: '⚠️ NSFW Neko' }, type: 1 },
-            { buttonId: '.anime random', buttonText: { displayText: '🎨 Random' }, type: 1 }
+            { buttonId: '.anime random', buttonText: { displayText: '🎨 Random' }, type: 1 },
+            { buttonId: '.menu', buttonText: { displayText: '🔙 Main Menu' }, type: 1 }
         ];
 
+        // Forward style thumbnail + buttons
         const buttonMessage = {
-            image: { url: data.url },
-            caption: captionText,
+            image: { url: data.url }, // main image
+            caption: `┏━❐  \`ᴀɴɪᴍᴇ ᴍᴇɴᴜ\`
+┃ *Category:* ${category.toUpperCase()}
+┃ *Bot:* BLOOD-XMD MINI
+┗━❐\n\n${captionText}`,
             footer: '💫 BLOOD-XMD MINI BOT 💫',
             buttons: buttons,
-            headerType: 4 // Image header + buttons
+            headerType: 4, // Image header
+            contextInfo: { forwardingScore: 999, isForwarded: true } // makes it forward style
         };
 
         await socket.sendMessage(from, buttonMessage, { quoted: msg });
