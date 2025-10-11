@@ -838,7 +838,154 @@ case 'gmenu': {
 
     await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
     break;
-}                                                  
+} 
+
+// ================= Anime Menu =================
+case 'amenu': {
+    const startTime = socketCreationTime.get(number) || Date.now();
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
+
+    const text = `┏━❐  \`ᴀɴɪᴍᴇ ᴍᴇɴᴜ\`
+┃ *Bot:* BLOOD-XMD MINI
+┃ *Uptime:* ${hours}h ${minutes}m ${seconds}s
+┗━❐
+
+🎴 Commands:
+• .waifu → SFW Waifu
+• .neko → SFW Neko
+• .nsfwneko → NSFW Neko (Private Only)
+• .randomanime → Random Anime Image
+• .animeinfo <name> → Anime Info from MyAnimeList`;
+
+    // Buttons as separate interactive message
+    const buttons = [
+        { buttonId: '.waifu', buttonText: { displayText: '💖 Waifu' }, type: 1 },
+        { buttonId: '.neko', buttonText: { displayText: '🐱 Neko' }, type: 1 },
+        { buttonId: '.nsfwneko', buttonText: { displayText: '⚠️ NSFW Neko' }, type: 1 },
+        { buttonId: '.randomanime', buttonText: { displayText: '🎨 Random' }, type: 1 }
+    ];
+
+    await socket.sendMessage(sender, { 
+        text,
+        footer: "💫 BLOOD-XMD MINI BOT 💫",
+        buttons,
+        headerType: 1
+    });
+    break;
+}
+
+// ================= IMAGE COMMANDS =================
+// WAIFU
+case 'waifu': {
+    try {
+        const res = await fetch('https://api.waifu.pics/sfw/waifu');
+        const data = await res.json();
+        if (!data?.url) return await socket.sendMessage(from, { text: '❌ Failed to fetch Waifu.' }, { quoted: msg });
+
+        await socket.sendMessage(from, {
+            imageMessage: { url: data.url },
+            caption: "💖 Here is your Waifu!",
+            footer: "💫 BLOOD-XMD MINI BOT 💫",
+            contextInfo: { forwardingScore: 999, isForwarded: true }
+        }, { quoted: msg });
+
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(from, { text: '❌ Error fetching Waifu image.' }, { quoted: msg });
+    }
+    break;
+}
+
+// NEKO
+case 'neko': {
+    try {
+        const res = await fetch('https://api.waifu.pics/sfw/neko');
+        const data = await res.json();
+        if (!data?.url) return await socket.sendMessage(from, { text: '❌ Failed to fetch Neko.' }, { quoted: msg });
+
+        await socket.sendMessage(from, {
+            imageMessage: { url: data.url },
+            caption: "🐱 Here is your Neko!",
+            footer: "💫 BLOOD-XMD MINI BOT 💫",
+            contextInfo: { forwardingScore: 999, isForwarded: true }
+        }, { quoted: msg });
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(from, { text: '❌ Error fetching Neko image.' }, { quoted: msg });
+    }
+    break;
+}
+
+// NSFW NEKO (PRIVATE ONLY)
+case 'nsfwneko': {
+    if (isGroup) return await socket.sendMessage(from, { text: '⚠️ NSFW only allowed in private chat.' }, { quoted: msg });
+
+    try {
+        const res = await fetch('https://api.waifu.pics/nsfw/neko');
+        const data = await res.json();
+        if (!data?.url) return await socket.sendMessage(from, { text: '❌ Failed to fetch NSFW Neko.' }, { quoted: msg });
+
+        await socket.sendMessage(from, {
+            imageMessage: { url: data.url },
+            caption: "⚠️ NSFW Neko (18+)",
+            footer: "💫 BLOOD-XMD MINI BOT 💫",
+            contextInfo: { forwardingScore: 999, isForwarded: true }
+        }, { quoted: msg });
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(from, { text: '❌ Error fetching NSFW image.' }, { quoted: msg });
+    }
+    break;
+}
+
+// RANDOM ANIME
+case 'randomanime': {
+    try {
+        const res = await fetch('https://api.waifu.pics/sfw/neko');
+        const data = await res.json();
+        if (!data?.url) return await socket.sendMessage(from, { text: '❌ Failed to fetch Random Anime.' }, { quoted: msg });
+
+        await socket.sendMessage(from, {
+            imageMessage: { url: data.url },
+            caption: "🎨 Random Anime Image",
+            footer: "💫 BLOOD-XMD MINI BOT 💫",
+            contextInfo: { forwardingScore: 999, isForwarded: true }
+        }, { quoted: msg });
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(from, { text: '❌ Error fetching Random Anime image.' }, { quoted: msg });
+    }
+    break;
+}
+
+// ================= ANIME INFO =================
+case 'animeinfo': {
+    const query = args.join(' ');
+    if (!query) return await socket.sendMessage(from, { text: '❌ Please provide anime name.' }, { quoted: msg });
+
+    try {
+        const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=1`);
+        const data = await res.json();
+        if (!data.data || data.data.length === 0) return await socket.sendMessage(from, { text: '❌ Anime not found.' }, { quoted: msg });
+
+        const anime = data.data[0];
+        const text = `*🎬 ${anime.title}*
+📅 Year: ${anime.year || 'Unknown'}
+📺 Episodes: ${anime.episodes || 'Unknown'}
+⭐ Score: ${anime.score || 'N/A'}
+📖 Synopsis: ${anime.synopsis?.slice(0, 300) + '...' || 'N/A'}
+🌐 MAL Link: ${anime.url}`;
+
+        await socket.sendMessage(from, { text }, { quoted: msg });
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(from, { text: '❌ Error fetching anime info.' }, { quoted: msg });
+    }
+    break;
+}                                                 
 
 ///kkkkkk
 
@@ -1415,105 +1562,7 @@ case 'facebook': {
 
                     });
                     break;
-                }               
-            
-case 'waifu': {
-  try {
-    const res = await fetch('https://api.waifu.pics/sfw/waifu');
-    const data = await res.json();
-    if (!data?.url) return await socket.sendMessage(from, { text: '❌ Failed to fetch Waifu.' }, { quoted: msg });
-
-    const buttons = [
-      { name: "quick_reply", buttonParamsJson: JSON.stringify({ display_text: "🐱 Neko", id: ".neko" }) },
-      { name: "quick_reply", buttonParamsJson: JSON.stringify({ display_text: "⚠️ NSFW", id: ".nsfwneko" }) },
-      { name: "quick_reply", buttonParamsJson: JSON.stringify({ display_text: "🎨 Random", id: ".randomanime" }) }
-    ];
-
-    const message = {
-      body: "💖 Here is your Waifu!",
-      footer: "💫 BLOOD-XMD MINI BOT 💫",
-      buttons,
-      header: {
-        title: "💞 Anime Zone 💞",
-        hasMediaAttachment: true,
-        imageMessage: { url: data.url }
-      }
-    };
-
-    await socket.sendMessage(from, { interactiveMessage: message }, { quoted: msg });
-  } catch (e) {
-    console.error(e);
-    await socket.sendMessage(from, { text: "❌ Error fetching Waifu image." }, { quoted: msg });
-  }
-  break;
-}
-
-// ✅ FIXED VERSION - NEKO
-case 'neko': {
-  try {
-    const res = await fetch('https://api.waifu.pics/sfw/neko');
-    const data = await res.json();
-    if (!data?.url) return await socket.sendMessage(from, { text: '❌ Failed to fetch Neko.' }, { quoted: msg });
-
-    const buttons = [
-      { name: "quick_reply", buttonParamsJson: JSON.stringify({ display_text: "💖 Waifu", id: ".waifu" }) },
-      { name: "quick_reply", buttonParamsJson: JSON.stringify({ display_text: "⚠️ NSFW", id: ".nsfwneko" }) },
-      { name: "quick_reply", buttonParamsJson: JSON.stringify({ display_text: "🎨 Random", id: ".randomanime" }) }
-    ];
-
-    const message = {
-      body: "🐱 Here is your Neko!",
-      footer: "💫 BLOOD-XMD MINI BOT 💫",
-      buttons,
-      header: {
-        title: "💞 Anime Zone 💞",
-        hasMediaAttachment: true,
-        imageMessage: { url: data.url }
-      }
-    };
-
-    await socket.sendMessage(from, { interactiveMessage: message }, { quoted: msg });
-  } catch (e) {
-    console.error(e);
-    await socket.sendMessage(from, { text: "❌ Error fetching Neko image." }, { quoted: msg });
-  }
-  break;
-}
-
-// ✅ FIXED VERSION - NSFW NEKO (PRIVATE ONLY)
-case 'nsfwneko': {
-  if (isGroup)
-    return await socket.sendMessage(from, { text: '⚠️ NSFW commands only allowed in private chat.' }, { quoted: msg });
-
-  try {
-    const res = await fetch('https://api.waifu.pics/nsfw/neko');
-    const data = await res.json();
-    if (!data?.url) return await socket.sendMessage(from, { text: '❌ Failed to fetch NSFW Neko.' }, { quoted: msg });
-
-    const buttons = [
-      { name: "quick_reply", buttonParamsJson: JSON.stringify({ display_text: "💖 Waifu", id: ".waifu" }) },
-      { name: "quick_reply", buttonParamsJson: JSON.stringify({ display_text: "🐱 Neko", id: ".neko" }) },
-      { name: "quick_reply", buttonParamsJson: JSON.stringify({ display_text: "🎨 Random", id: ".randomanime" }) }
-    ];
-
-    const message = {
-      body: "⚠️ NSFW Neko (18+)",
-      footer: "💫 BLOOD-XMD MINI BOT 💫",
-      buttons,
-      header: {
-        title: "💞 Anime Zone 💞",
-        hasMediaAttachment: true,
-        imageMessage: { url: data.url }
-      }
-    };
-
-    await socket.sendMessage(from, { interactiveMessage: message }, { quoted: msg });
-  } catch (e) {
-    console.error(e);
-    await socket.sendMessage(from, { text: "❌ Error fetching NSFW image." }, { quoted: msg });
-  }
-  break;
-}
+                }                        
 
             case 'npm': {
     const axios = require('axios');
