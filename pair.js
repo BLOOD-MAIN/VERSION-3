@@ -1418,38 +1418,47 @@ case 'facebook': {
                 }               
 
             case 'anime': {
-    const category = args[0]?.toLowerCase() || 'waifu'; // default: waifu
+    const category = args[0]?.toLowerCase() || 'waifu'; // default category
     let apiUrl = '';
     let captionText = '';
 
-    // Decide API endpoint
-    if (category === 'waifu') {
-        apiUrl = 'https://api.waifu.pics/sfw/waifu';
-        captionText = '💖 Here is your Waifu!';
-    } else if (category === 'neko') {
-        apiUrl = 'https://api.waifu.pics/sfw/neko';
-        captionText = '🐱 Here is your Neko!';
-    } else if (category === 'nsfwneko') {
-        if (isGroup) return await socket.sendMessage(from, { text: '⚠️ NSFW content only allowed in private chat.' }, { quoted: msg });
-        apiUrl = 'https://api.waifu.pics/nsfw/neko';
-        captionText = '⚠️ NSFW Neko (18+)';
-    } else if (category === 'random') {
-        apiUrl = 'https://api.waifu.pics/sfw/neko';
-        captionText = '🎨 Random Anime Image';
-    } else {
-        return await socket.sendMessage(from, { text: '❌ Invalid category! Use: waifu, neko, nsfwneko, random' }, { quoted: msg });
+    // Choose API endpoint based on category
+    switch (category) {
+        case 'waifu':
+            apiUrl = 'https://api.waifu.pics/sfw/waifu';
+            captionText = '💖 Here is your Waifu!';
+            break;
+        case 'neko':
+            apiUrl = 'https://api.waifu.pics/sfw/neko';
+            captionText = '🐱 Here is your Neko!';
+            break;
+        case 'nsfwneko':
+            if (isGroup) {
+                await socket.sendMessage(from, { text: '⚠️ NSFW content can only be sent in private chat.' }, { quoted: msg });
+                return;
+            }
+            apiUrl = 'https://api.waifu.pics/nsfw/neko';
+            captionText = '⚠️ NSFW Neko (18+)';
+            break;
+        case 'random':
+            apiUrl = 'https://api.waifu.pics/sfw/neko';
+            captionText = '🎨 Random Anime Image';
+            break;
+        default:
+            await socket.sendMessage(from, { text: '❌ Invalid category! Use: waifu, neko, nsfwneko, random' }, { quoted: msg });
+            return;
     }
 
     try {
-        // Fetch image
         const res = await fetch(apiUrl);
         const data = await res.json();
 
         if (!data || !data.url) {
-            return await socket.sendMessage(from, { text: '❌ Failed to fetch image. Try again.' }, { quoted: msg });
+            await socket.sendMessage(from, { text: '❌ Failed to fetch image. Try again.' }, { quoted: msg });
+            return;
         }
 
-        // Buttons
+        // Buttons for menu
         const buttons = [
             { buttonId: '.anime waifu', buttonText: { displayText: '💖 Waifu' }, type: 1 },
             { buttonId: '.anime neko', buttonText: { displayText: '🐱 Neko' }, type: 1 },
@@ -1458,23 +1467,20 @@ case 'facebook': {
             { buttonId: '.menu', buttonText: { displayText: '🔙 Main Menu' }, type: 1 }
         ];
 
-        // Forward style thumbnail + buttons
+        // Build message with image + buttons
         const buttonMessage = {
-            image: { url: data.url }, // main image
-            caption: `┏━❐  \`ᴀɴɪᴍᴇ ᴍᴇɴᴜ\`
-┃ *Category:* ${category.toUpperCase()}
-┃ *Bot:* BLOOD-XMD MINI
-┗━❐\n\n${captionText}`,
+            image: { url: data.url }, // main anime image
+            caption: `┏━❐  \`ᴀɴɪᴍᴇ ᴍᴇɴᴜ\`\n┃ *Category:* ${category.toUpperCase()}\n┗━❐\n\n${captionText}`,
             footer: '💫 BLOOD-XMD MINI BOT 💫',
             buttons: buttons,
-            headerType: 4, // Image header
-            contextInfo: { forwardingScore: 999, isForwarded: true } // makes it forward style
+            headerType: 4, // image header + buttons
+            contextInfo: { forwardingScore: 999, isForwarded: true } // makes it look like forwarded
         };
 
         await socket.sendMessage(from, buttonMessage, { quoted: msg });
 
-    } catch (err) {
-        console.error('Anime command error:', err);
+    } catch (error) {
+        console.error('Anime command error:', error);
         await socket.sendMessage(from, { text: '❌ Something went wrong while fetching anime image.' }, { quoted: msg });
     }
 
