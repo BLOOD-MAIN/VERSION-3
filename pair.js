@@ -786,7 +786,42 @@ case 'bmenu': {
 
     await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
     break;
-}                                                   
+} 
+
+case 'jmenu': {
+    const startTime = socketCreationTime.get(number) || Date.now();
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
+
+    const text = `*✨ Anime Menu ✨*
+    
+⏱ Bot Uptime: ${hours}h ${minutes}m ${seconds}s
+
+🎬 Commands:
+1️⃣ .waifu - Get random SFW waifu image
+2️⃣ .neko - Get random SFW neko image
+3️⃣ .nsfwneko - Get NSFW neko image (18+)
+4️⃣ .animeinfo <name> - Get anime info from MyAnimeList
+5️⃣ .randomanime - Random anime picture`;
+
+    const buttons = [
+        { buttonId: '.waifu', buttonText: { displayText: 'Waifu' }, type: 1 },
+        { buttonId: '.neko', buttonText: { displayText: 'Neko' }, type: 1 },
+        { buttonId: '.nsfwneko', buttonText: { displayText: 'NSFW Neko' }, type: 1 },
+        { buttonId: '.randomanime', buttonText: { displayText: 'Random Anime' }, type: 1 }
+    ];
+
+    const buttonMessage = {
+        text: text,
+        footer: 'Anime Bot 🐾',
+        buttons: buttons,
+        headerType: 1
+    };
+
+    await socket.sendMessage(from, buttonMessage, { quoted: msg });
+}                                                  
 
 ///kkkkkk
 
