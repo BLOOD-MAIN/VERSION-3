@@ -1371,22 +1371,22 @@ case 'facebook': {
 
     while (retries > 0) {
         try {
-            // API call
+            // 1️⃣ API call
             const apiUrl = 'https://apis.sandarux.sbs/api/animeporn/random';
             const response = await axios.get(apiUrl);
 
-            // Validate response
+            // 2️⃣ Validate API response
             if (!response.data || !response.data.url) {
                 retries--;
                 if (retries === 0) {
                     return await socket.sendMessage(sender, { text: '❌ Could not fetch anime image. Please try again later.' });
                 }
-                continue;
+                continue; // Retry
             }
 
             const imageUrl = response.data.url;
 
-            // Buttons
+            // 3️⃣ Buttons
             const buttons = [
                 { buttonId: 'animeporn_next', buttonText: { displayText: 'Next 🔄' }, type: 1 },
                 { buttonId: 'animeporn_download', buttonText: { displayText: 'Download 💾' }, type: 1 }
@@ -1400,7 +1400,7 @@ case 'facebook': {
                 headerType: 4
             };
 
-            // Send message
+            // 4️⃣ Send message
             await socket.sendMessage(sender, buttonMessage);
             break; // Exit loop if success
 
