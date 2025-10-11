@@ -1475,53 +1475,61 @@ case 'anime_download': {
     break;
 }
 
-            case 'waifu': {
-    const res = await fetch('https://api.waifu.pics/sfw/waifu');
-    const data = await res.json();
-    await socket.sendMessage(from, { image: { url: data.url }, caption: '💖 Here is your waifu!' }, { quoted: msg });
+            case 'anime': {
+    const category = args[0]?.toLowerCase() || 'waifu'; // default: waifu
+    let apiUrl = '';
+    let captionText = '';
+
+    // Decide API endpoint based on category
+    if (category === 'waifu') {
+        apiUrl = 'https://api.waifu.pics/sfw/waifu';
+        captionText = '💖 Here is your Waifu!';
+    } else if (category === 'neko') {
+        apiUrl = 'https://api.waifu.pics/sfw/neko';
+        captionText = '🐱 Here is your Neko!';
+    } else if (category === 'nsfwneko') {
+        if (isGroup) return await socket.sendMessage(from, { text: '⚠️ NSFW content only allowed in private chat.' }, { quoted: msg });
+        apiUrl = 'https://api.waifu.pics/nsfw/neko';
+        captionText = '⚠️ NSFW Neko (18+)';
+    } else if (category === 'random') {
+        apiUrl = 'https://api.waifu.pics/sfw/neko';
+        captionText = '🎨 Random Anime Image';
+    } else {
+        return await socket.sendMessage(from, { text: '❌ Invalid category! Use: waifu, neko, nsfwneko, random' }, { quoted: msg });
+    }
+
+    try {
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+
+        if (!data || !data.url) {
+            return await socket.sendMessage(from, { text: '❌ Failed to fetch image. Try again.' }, { quoted: msg });
+        }
+
+        const buttons = [
+            { buttonId: '.anime waifu', buttonText: { displayText: '💖 Waifu' }, type: 1 },
+            { buttonId: '.anime neko', buttonText: { displayText: '🐱 Neko' }, type: 1 },
+            { buttonId: '.anime nsfwneko', buttonText: { displayText: '⚠️ NSFW Neko' }, type: 1 },
+            { buttonId: '.anime random', buttonText: { displayText: '🎨 Random' }, type: 1 }
+        ];
+
+        const buttonMessage = {
+            image: { url: data.url },
+            caption: captionText,
+            footer: '💫 BLOOD-XMD MINI BOT 💫',
+            buttons: buttons,
+            headerType: 4 // Image header + buttons
+        };
+
+        await socket.sendMessage(from, buttonMessage, { quoted: msg });
+
+    } catch (err) {
+        console.error('Anime command error:', err);
+        await socket.sendMessage(from, { text: '❌ Something went wrong while fetching anime image.' }, { quoted: msg });
+    }
+
+    break;
 }
-break;
-
-case 'neko': {
-    const res = await fetch('https://api.waifu.pics/sfw/neko');
-    const data = await res.json();
-    await socket.sendMessage(from, { image: { url: data.url }, caption: '🐱 Here is your neko!' }, { quoted: msg });
-}
-break;
-
-case 'nsfwneko': {
-    const res = await fetch('https://api.waifu.pics/nsfw/neko');
-    const data = await res.json();
-    await socket.sendMessage(from, { image: { url: data.url }, caption: '⚠️ NSFW Neko (18+)' }, { quoted: msg });
-}
-break;
-
-case 'randomanime': {
-    const res = await fetch('https://api.waifu.pics/sfw/neko'); // SFW random anime pic
-    const data = await res.json();
-    await socket.sendMessage(from, { image: { url: data.url }, caption: '🎨 Random Anime Image' }, { quoted: msg });
-}
-break;
-
-case 'animeinfo': {
-    const query = args.join(' ');
-    if (!query) return await socket.sendMessage(from, { text: '❌ Please provide anime name' }, { quoted: msg });
-
-    const res = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=1`);
-    const data = await res.json();
-    if (!data.data || data.data.length === 0) return await socket.sendMessage(from, { text: '❌ Anime not found' }, { quoted: msg });
-
-    const anime = data.data[0];
-    const text = `*🎬 ${anime.title}*
-📅 Year: ${anime.year || 'Unknown'}
-📺 Episodes: ${anime.episodes || 'Unknown'}
-⭐ Score: ${anime.score || 'N/A'}
-📖 Synopsis: ${anime.synopsis?.slice(0, 300) + '...' || 'N/A'}
-🌐 MAL Link: ${anime.url}`;
-
-    await socket.sendMessage(from, { text: text }, { quoted: msg });
-}
-break;
 
             case 'npm': {
     const axios = require('axios');
