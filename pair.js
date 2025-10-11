@@ -1291,33 +1291,122 @@ case 'facebook': {
 
     const { title, desc, sd, hd, thumbnail } = response.data.result;
 
-    let caption = `*🎬 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤 𝐕𝐢𝐝𝐞𝐨 𝐃𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐞𝐫*
-────────────────────
-📜 *Title:* ${title || 'No title'}
-📝 *Description:* ${desc || 'N/A'}
-🌐 *Source:* Facebook
-────────────────────
-📥 *Choose video quality below 👇*`;
+    const caption = `
+╭───────────────────────────────
+│ 🎬 *${title || 'Untitled Video'}*
+│───────────────────────────────
+│ 📝 *Description:* ${desc || 'No description available'}
+│ 🌐 *Source:* Facebook
+│───────────────────────────────
+│ 📥 *Choose download option below 👇*
+╰───────────────────────────────
+    `;
 
     const buttons = [
       { buttonId: `.fbmp4sd ${fbUrl}`, buttonText: { displayText: '📺 SD Quality' }, type: 1 },
-      { buttonId: `.fbmp4hd ${fbUrl}`, buttonText: { displayText: '🎥 HD Quality' }, type: 1 }
+      { buttonId: `.fbmp4hd ${fbUrl}`, buttonText: { displayText: '🎥 HD Quality' }, type: 1 },
+      { buttonId: `.fbvoice ${fbUrl}`, buttonText: { displayText: '🎧 Voice (Audio)' }, type: 1 },
+      { buttonId: `.fbdoc ${fbUrl}`, buttonText: { displayText: '📄 Document (MP4)' }, type: 1 }
     ];
 
-    const buttonMessage = {
+    await socket.sendMessage(sender, {
       image: { url: thumbnail || 'https://files.catbox.moe/b7gyod.jpg' },
       caption: caption,
       footer: '🚀 BLOOD XMD MINI BOT | Facebook Downloader',
       buttons: buttons,
       headerType: 4,
       contextInfo: fakeForward
-    };
-
-    await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
+    }, { quoted: adhimini });
 
   } catch (error) {
     console.error('Error downloading Facebook video:', error);
     reply('❌ Unable to process your Facebook video. Please try again later.');
+  }
+  break;
+}
+
+// ✅ SD Download
+case 'fbmp4sd': {
+  try {
+    const fbUrl = args.join(" ");
+    const apiKey = 'e276311658d835109c';
+    const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
+    const response = await axios.get(apiUrl);
+
+    const { title, sd } = response.data.result;
+    await socket.sendMessage(sender, {
+      video: { url: sd },
+      caption: `*📺 ${title || 'Facebook SD Video'}*\n\n🚀 BLOOD XMD MINI BOT`,
+      contextInfo: fakeForward
+    }, { quoted: adhimini });
+  } catch {
+    reply('❌ Failed to download SD video.');
+  }
+  break;
+}
+
+// ✅ HD Download
+case 'fbmp4hd': {
+  try {
+    const fbUrl = args.join(" ");
+    const apiKey = 'e276311658d835109c';
+    const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
+    const response = await axios.get(apiUrl);
+
+    const { title, hd } = response.data.result;
+    if (!hd) return reply('❌ HD version not available for this video.');
+
+    await socket.sendMessage(sender, {
+      video: { url: hd },
+      caption: `*🎥 ${title || 'Facebook HD Video'}*\n\n🚀 BLOOD XMD MINI BOT`,
+      contextInfo: fakeForward
+    }, { quoted: adhimini });
+  } catch {
+    reply('❌ Failed to download HD video.');
+  }
+  break;
+}
+
+// ✅ Voice Download
+case 'fbvoice': {
+  try {
+    const fbUrl = args.join(" ");
+    const apiKey = 'e276311658d835109c';
+    const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
+    const response = await axios.get(apiUrl);
+
+    const { title, sd } = response.data.result;
+    await socket.sendMessage(sender, {
+      audio: { url: sd },
+      mimetype: 'audio/mp4',
+      ptt: true,
+      fileName: `${title || 'Facebook Audio'}.mp3`,
+      contextInfo: fakeForward
+    }, { quoted: adhimini });
+  } catch {
+    reply('❌ Failed to extract audio.');
+  }
+  break;
+}
+
+// ✅ Document Download
+case 'fbdoc': {
+  try {
+    const fbUrl = args.join(" ");
+    const apiKey = 'e276311658d835109c';
+    const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
+    const response = await axios.get(apiUrl);
+
+    const { title, sd } = response.data.result;
+    await socket.sendMessage(sender, {
+      document: { url: sd },
+      mimetype: 'video/mp4',
+      fileName: `${title || 'Facebook Video'}.mp4`,
+      caption: `*📄 Facebook Video (Document)*\n🚀 BLOOD XMD MINI BOT`,
+      contextInfo: fakeForward
+    }, { quoted: adhimini });
+  } catch {
+    reply('❌ Failed to send as document.');
   }
   break;
 }
