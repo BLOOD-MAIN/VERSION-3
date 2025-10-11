@@ -1366,38 +1366,52 @@ case 'facebook': {
                 }
         
             case 'animeporn': {
-    try {
-        const axios = require('axios');
+    const axios = require('axios');
+    let retries = 2; // Retry 2 times if API fails
 
-        // API එකෙන් random image එක fetch කරනවා
-        const apiUrl = 'https://apis.sandarux.sbs/api/animeporn/random';
-        const response = await axios.get(apiUrl);
+    while (retries > 0) {
+        try {
+            // API call
+            const apiUrl = 'https://apis.sandarux.sbs/api/animeporn/random';
+            const response = await axios.get(apiUrl);
 
-        if (!response.data || !response.data.url) {
-            return await socket.sendMessage(sender, { text: '*❌ Could not fetch anime image. Try again later.*' });
+            // Validate response
+            if (!response.data || !response.data.url) {
+                retries--;
+                if (retries === 0) {
+                    return await socket.sendMessage(sender, { text: '❌ Could not fetch anime image. Please try again later.' });
+                }
+                continue;
+            }
+
+            const imageUrl = response.data.url;
+
+            // Buttons
+            const buttons = [
+                { buttonId: 'animeporn_next', buttonText: { displayText: 'Next 🔄' }, type: 1 },
+                { buttonId: 'animeporn_download', buttonText: { displayText: 'Download 💾' }, type: 1 }
+            ];
+
+            const buttonMessage = {
+                image: { url: imageUrl },
+                caption: '*🔥 Random Anime NSFW 🚀*',
+                footer: 'BLOOD XMD Mini Bot',
+                buttons: buttons,
+                headerType: 4
+            };
+
+            // Send message
+            await socket.sendMessage(sender, buttonMessage);
+            break; // Exit loop if success
+
+        } catch (error) {
+            console.error('Error fetching anime image:', error);
+            retries--;
+
+            if (retries === 0) {
+                await socket.sendMessage(sender, { text: '❌ Unable to fetch the anime image. API might be down. Please try again later.' });
+            }
         }
-
-        const imageUrl = response.data.url;
-
-        // Buttons setup (example: Download, Next)
-        const buttons = [
-            { buttonId: 'animeporn_next', buttonText: { displayText: 'Next 🔄' }, type: 1 },
-            { buttonId: 'animeporn_download', buttonText: { displayText: 'Download 💾' }, type: 1 }
-        ];
-
-        const buttonMessage = {
-            image: { url: imageUrl },
-            caption: '*🔥 Random Anime NSFW 🚀*',
-            footer: 'BLOOD XMD Mini Bot',
-            buttons: buttons,
-            headerType: 4
-        };
-
-        await socket.sendMessage(sender, buttonMessage);
-
-    } catch (error) {
-        console.error('Error fetching anime image:', error);
-        await socket.sendMessage(sender, { text: '❌ Unable to fetch the anime image. Please try again later.' });
     }
     break;
 }
