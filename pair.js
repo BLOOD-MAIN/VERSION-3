@@ -788,39 +788,56 @@ case 'bmenu': {
     break;
 } 
 
-case 'jmenu': {
+case 'amenu': {
     const startTime = socketCreationTime.get(number) || Date.now();
     const uptime = Math.floor((Date.now() - startTime) / 1000);
     const hours = Math.floor(uptime / 3600);
     const minutes = Math.floor((uptime % 3600) / 60);
     const seconds = Math.floor(uptime % 60);
 
-    const text = `*✨ Anime Menu ✨*
-    
-⏱ Bot Uptime: ${hours}h ${minutes}m ${seconds}s
+    // Reaction (optional)
+    await socket.sendMessage(sender, { 
+        react: { 
+            text: "🎌",
+            key: msg.key 
+        } 
+    });
 
-🎬 Commands:
-1️⃣ .waifu - Get random SFW waifu image
-2️⃣ .neko - Get random SFW neko image
-3️⃣ .nsfwneko - Get NSFW neko image (18+)
-4️⃣ .animeinfo <name> - Get anime info from MyAnimeList
-5️⃣ .randomanime - Random anime picture`;
+    // Menu Text
+    const animeMenuText = `┏━❐  \`ᴀɴɪᴍᴇ ᴍᴇɴᴜ\`
+┃ *⭔ ʙᴏᴛ ɴᴀᴍᴇ - 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪɪ*
+┃ *⭔ ᴘʟᴀᴛꜰʀᴏᴍ - Heroku*
+┃ *⭔ ᴜᴘᴛɪᴍᴇ:* ${hours}h ${minutes}m ${seconds}s
+┗━❐
 
+╭─═❮ 🎴 ᴀɴɪᴍᴇ 🔗 ❯═━───❖
+*│ 🎀 .waifu →* Get random waifu image
+*│ 🐱 .neko →* Get random neko image
+*│ ⚠️ .nsfwneko →* NSFW neko (18+)
+*│ 🎨 .randomanime →* Random anime picture
+*│ 📖 .animeinfo <name> →* Anime info from MyAnimeList
+╰━━━━━━━━━━━━━━━━━━━❖`;
+
+    // Buttons
     const buttons = [
-        { buttonId: '.waifu', buttonText: { displayText: 'Waifu' }, type: 1 },
-        { buttonId: '.neko', buttonText: { displayText: 'Neko' }, type: 1 },
-        { buttonId: '.nsfwneko', buttonText: { displayText: 'NSFW Neko' }, type: 1 },
-        { buttonId: '.randomanime', buttonText: { displayText: 'Random Anime' }, type: 1 }
+        { buttonId: '.waifu', buttonText: { displayText: '💖 Waifu' }, type: 1 },
+        { buttonId: '.neko', buttonText: { displayText: '🐱 Neko' }, type: 1 },
+        { buttonId: '.nsfwneko', buttonText: { displayText: '⚠️ NSFW Neko' }, type: 1 },
+        { buttonId: '.randomanime', buttonText: { displayText: '🎨 Random Anime' }, type: 1 },
+        { buttonId: '.menu', buttonText: { displayText: '🔙 Back to Main Menu' }, type: 1 }
     ];
 
     const buttonMessage = {
-        text: text,
-        footer: 'Anime Bot 🐾',
+        image: { url: "https://files.catbox.moe/lwdp9g.jpg" }, // thumbnail
+        caption: animeMenuText,
+        footer: "💫 BLOOD-XMD MINI BOT 💫",
         buttons: buttons,
-        headerType: 1
+        headerType: 4, // Image header
+        contextInfo: fakeForward // optional forward context
     };
 
-    await socket.sendMessage(from, buttonMessage, { quoted: msg });
+    await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
+    break;
 }                                                  
 
 ///kkkkkk
