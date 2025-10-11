@@ -788,7 +788,7 @@ case 'bmenu': {
     break;
 } 
 
-case 'amenu': {
+case 'gmenu': {
     const startTime = socketCreationTime.get(number) || Date.now();
     const uptime = Math.floor((Date.now() - startTime) / 1000);
     const hours = Math.floor(uptime / 3600);
