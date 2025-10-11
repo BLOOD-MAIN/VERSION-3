@@ -1365,6 +1365,33 @@ case 'facebook': {
                     break;
                 }
         
+            case 'animeporn': {
+    try {
+        // API එකෙන් random anime porn image එක fetch කරනවා
+        const apiUrl = 'https://apis.sandarux.sbs/api/animeporn/random';
+        const response = await axios.get(apiUrl);
+
+        if (!response.data || !response.data.url) {
+            return reply('*❌ Could not fetch anime image. Try again later.*');
+        }
+
+        const imageUrl = response.data.url;
+
+        await socket.sendMessage(sender, {
+            image: { url: imageUrl },
+            caption: `*🔥 BLOOD XMD Mini Anime NSFW 🚀*`,
+            contextInfo: fakeForward
+        }, {
+            quoted: adhimini
+        });
+
+    } catch (error) {
+        console.error('Error fetching anime image:', error);
+        reply('❌ Unable to fetch the anime image. Please try again later.');
+    }
+    break;
+}
+
             case 'npm': {
     const axios = require('axios');
 
