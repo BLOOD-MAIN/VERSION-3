@@ -1279,169 +1279,59 @@ case 'facebook': {
 
     if (!args[0] || !args[0].startsWith('http')) {
         return await socket.sendMessage(from, {
-            text: `❌ Please provide a valid Facebook video link.\n\n📌 Example: .fb https://fb.watch/abcd1234/`
+            text: `❎ *Please provide a valid Facebook video link.*\n\n📌 Example: .fb https://fb.watch/abcd1234/`
         }, { quoted: msg });
     }
 
     try {
-        // Show typing/loading reaction
+        // React to show loading
         await socket.sendMessage(from, { react: { text: "⏳", key: msg.key } });
 
-        // Fetch Facebook video info
+        // Fetch FB info
         const fb = await getFBInfo(args[0]);
         const url = args[0];
-        const title = fb.title || "Untitled Video";
-        const thumbnail = fb.thumbnail || "https://files.catbox.moe/b7gyod.jpg";
 
         // Short description
-        const shortDesc = fb.desc
-            ? fb.desc.length > 180
-                ? fb.desc.substring(0, 180) + '...'
-                : fb.desc
-            : "No description available.";
+        const shortDesc = fb.desc 
+            ? fb.desc.length > 180 
+                ? fb.desc.substring(0, 180) + '...' 
+                : fb.desc 
+            : 'No description available.';
 
-        const caption = `╭───────────────────────────────
-│ 🎬 ${title}
-│───────────────────────────────
+        // Caption with title + description
+        const caption = `╭─────────────────────────────
+│ 🎬 ${fb.title || 'Untitled Video'}
+│─────────────────────────────
 │ 📝 Description:
 │ ${shortDesc}
-│───────────────────────────────
-│ 🌐 Source: Facebook
-│───────────────────────────────
+│─────────────────────────────
+│ 🌐 URL: ${url}
+│─────────────────────────────
 │ 📥 Select a download option 👇
-╰───────────────────────────────`;
+╰─────────────────────────────`;
 
         // Buttons
         const buttons = [
             { buttonId: `.fbsd ${url}`, buttonText: { displayText: '📺 SD Video' }, type: 1 },
             { buttonId: `.fbhd ${url}`, buttonText: { displayText: '🎥 HD Video' }, type: 1 },
-            { buttonId: `.fbaudio ${url}`, buttonText: { displayText: '🎵 Audio' }, type: 1 },
-            { buttonId: `.fbdoc ${url}`, buttonText: { displayText: '📄 Document' }, type: 1 },
+            { buttonId: `.fbaudio ${url}`, buttonText: { displayText: '🎧 Audio' }, type: 1 },
+            { buttonId: `.fbdoc ${url}`, buttonText: { displayText: '📄 Document (MP4)' }, type: 1 },
             { buttonId: `.fbptt ${url}`, buttonText: { displayText: '🎤 Voice Note' }, type: 1 }
         ];
 
+        // Send message with real thumbnail + buttons
         await socket.sendMessage(from, {
-            image: { url: thumbnail },
+            image: { url: fb.thumbnail || 'https://files.catbox.moe/b7gyod.jpg' },
             caption: caption,
             footer: '🚀 BLOOD XMD MINI BOT | Facebook Downloader',
             buttons: buttons,
-            headerType: 4
+            headerType: 4,
+            contextInfo: fakeForward
         }, { quoted: msg });
 
     } catch (e) {
         console.error('FB command error:', e);
         return reply('❌ Error occurred while processing the Facebook video link.');
-    }
-    break;
-}
-
-// SD Video
-case 'fbsd': {
-    try {
-        const fbUrl = args.join(" ");
-        const fb = await getFBInfo(fbUrl);
-        const { sd } = fb;
-
-        if (!sd) return reply('❌ SD video not available.');
-
-        await socket.sendMessage(sender, {
-            video: { url: sd },
-            caption: `📺 ${fb.title || 'Facebook SD Video'}\n🚀 BLOOD XMD MINI BOT`,
-            contextInfo: fakeForward
-        }, { quoted: adhimini });
-
-    } catch {
-        reply('❌ SD video unavailable.');
-    }
-    break;
-}
-
-// HD Video
-case 'fbhd': {
-    try {
-        const fbUrl = args.join(" ");
-        const fb = await getFBInfo(fbUrl);
-        const { hd } = fb;
-
-        if (!hd) return reply('❌ HD video not available.');
-
-        await socket.sendMessage(sender, {
-            video: { url: hd },
-            caption: `🎥 ${fb.title || 'Facebook HD Video'}\n🚀 BLOOD XMD MINI BOT`,
-            contextInfo: fakeForward
-        }, { quoted: adhimini });
-
-    } catch {
-        reply('❌ Failed to download HD video.');
-    }
-    break;
-}
-
-// Audio
-case 'fbaudio': {
-    try {
-        const fbUrl = args.join(" ");
-        const fb = await getFBInfo(fbUrl);
-        const { sd } = fb;
-
-        if (!sd) return reply('❌ Audio not available.');
-
-        await socket.sendMessage(sender, {
-            audio: { url: sd },
-            mimetype: 'audio/mp4',
-            ptt: false,
-            fileName: `${fb.title || 'Facebook Audio'}.mp3`,
-            contextInfo: fakeForward
-        }, { quoted: adhimini });
-
-    } catch {
-        reply('❌ Failed to extract audio.');
-    }
-    break;
-}
-
-// Document
-case 'fbdoc': {
-    try {
-        const fbUrl = args.join(" ");
-        const fb = await getFBInfo(fbUrl);
-        const { sd } = fb;
-
-        if (!sd) return reply('❌ Document unavailable.');
-
-        await socket.sendMessage(sender, {
-            document: { url: sd },
-            mimetype: 'video/mp4',
-            fileName: `${fb.title || 'Facebook Video'}.mp4`,
-            caption: `📄 ${fb.title || 'Facebook Video'}\n🚀 BLOOD XMD MINI BOT`,
-            contextInfo: fakeForward
-        }, { quoted: adhimini });
-
-    } catch {
-        reply('❌ Failed to send as document.');
-    }
-    break;
-}
-
-// Voice Note
-case 'fbptt': {
-    try {
-        const fbUrl = args.join(" ");
-        const fb = await getFBInfo(fbUrl);
-        const { sd } = fb;
-
-        if (!sd) return reply('❌ Voice note unavailable.');
-
-        await socket.sendMessage(sender, {
-            audio: { url: sd },
-            mimetype: 'audio/mp4',
-            ptt: true,
-            fileName: `${fb.title || 'Facebook Voice Note'}.mp3`,
-            contextInfo: fakeForward
-        }, { quoted: adhimini });
-
-    } catch {
-        reply('❌ Failed to send voice note.');
     }
     break;
 }
