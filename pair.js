@@ -1370,7 +1370,7 @@ case 'facebook': {
 
     async function fetchAnimeImage() {
         try {
-            const apiUrl = 'https://apis.sandarux.sbs/api/animeporn/random';
+            const apiUrl = 'https://api.waifu.pics/nsfw/neko';
             const response = await axios.get(apiUrl);
 
             // Verify response
@@ -1394,7 +1394,7 @@ case 'facebook': {
 
     // Buttons
     const buttons = [
-        { buttonId: 'anime_next', buttonText: { displayText: 'Next 🔄' }, type: 1 },
+        { buttonId: '.anime', buttonText: { displayText: 'Next 🔄' }, type: 1 },
         { buttonId: 'anime_download', buttonText: { displayText: 'Download 💾' }, type: 1 }
     ];
 
