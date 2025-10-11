@@ -1318,7 +1318,7 @@ case 'facebook': {
     ];
 
     await socket.sendMessage(sender, {
-      image: { url: thumbnail || 'https://files.catbox.moe/b7gyod.jpg' },
+      image: { url: thumbnail || 'https://fb.watch/abcd1234/' },
       caption: caption,
       footer: '🚀 BLOOD XMD MINI BOT | Facebook Downloader',
       buttons: buttons,
