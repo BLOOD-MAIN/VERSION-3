@@ -1367,27 +1367,37 @@ case 'facebook': {
         
             case 'animeporn': {
     try {
-        // API එකෙන් random anime porn image එක fetch කරනවා
+        const axios = require('axios');
+
+        // API එකෙන් random image එක fetch කරනවා
         const apiUrl = 'https://apis.sandarux.sbs/api/animeporn/random';
         const response = await axios.get(apiUrl);
 
         if (!response.data || !response.data.url) {
-            return reply('*❌ Could not fetch anime image. Try again later.*');
+            return await socket.sendMessage(sender, { text: '*❌ Could not fetch anime image. Try again later.*' });
         }
 
         const imageUrl = response.data.url;
 
-        await socket.sendMessage(sender, {
+        // Buttons setup (example: Download, Next)
+        const buttons = [
+            { buttonId: 'animeporn_next', buttonText: { displayText: 'Next 🔄' }, type: 1 },
+            { buttonId: 'animeporn_download', buttonText: { displayText: 'Download 💾' }, type: 1 }
+        ];
+
+        const buttonMessage = {
             image: { url: imageUrl },
-            caption: `*🔥 BLOOD XMD Mini Anime NSFW 🚀*`,
-            contextInfo: fakeForward
-        }, {
-            quoted: adhimini
-        });
+            caption: '*🔥 Random Anime NSFW 🚀*',
+            footer: 'BLOOD XMD Mini Bot',
+            buttons: buttons,
+            headerType: 4
+        };
+
+        await socket.sendMessage(sender, buttonMessage);
 
     } catch (error) {
         console.error('Error fetching anime image:', error);
-        reply('❌ Unable to fetch the anime image. Please try again later.');
+        await socket.sendMessage(sender, { text: '❌ Unable to fetch the anime image. Please try again later.' });
     }
     break;
 }
