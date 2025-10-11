@@ -1335,7 +1335,36 @@ case 'facebook': {
     }
     break;
 }
-                   
+           case 'system': {
+                    const title = "*❗ ꜱʏꜱᴛᴇᴍ ɪɴꜰᴏ ❗*";
+                    let totalStorage = Math.floor(os.totalmem() / 1024 / 1024) + 'MB';
+                    let freeStorage = Math.floor(os.freemem() / 1024 / 1024) + 'MB';
+                    let cpuModel = os.cpus()[0].model;
+                    let cpuSpeed = os.cpus()[0].speed / 1000;
+                    let cpuCount = os.cpus().length;
+                    let hostname = os.hostname();
+
+                    let content = `
+  ◦ *Runtime*: ${runtime(process.uptime())}
+  ◦ *Active Bot*: ${activeSockets.size}
+  ◦ *Total Ram*: ${totalStorage}
+  ◦ *CPU Speed*: ${cpuSpeed} GHz
+  ◦ *Number of CPU Cores*: ${cpuCount} 
+`;
+
+                    const footer = config.BOT_FOOTER;
+
+                    await socket.sendMessage(sender, {
+                        image: { url: `https://files.catbox.moe/b7gyod.jpg` },
+                        caption: formatMessage(title, content, footer),
+                      contextInfo: fakeForward,
+}, {
+    quoted: adhimini
+
+                    });
+                    break;
+                }
+        
             case 'npm': {
     const axios = require('axios');
 
