@@ -1423,6 +1423,103 @@ case 'anime_download': {
     break;
 }
 
+            case 'movie': {
+    const query = args.join(' ');
+    if (!query) {
+        return await socket.sendMessage(sender, { text: '❌ Please provide a movie name. Example: .movie Avengers' });
+    }
+
+    try {
+        // 1️⃣ Search API
+        const searchUrl = `https://apis.sandarux.sbs/api/download/sinhalasub/search?q=${encodeURIComponent(query)}`;
+        const searchRes = await axios.get(searchUrl);
+
+        const results = searchRes.data.results;
+        if (!results || results.length === 0) {
+            return await socket.sendMessage(sender, { text: '❌ No results found for your query.' });
+        }
+
+        // Prepare buttons for first 5 results
+        const buttons = results.slice(0, 5).map((movie, idx) => ({
+            buttonId: `movie_select_${idx}`,
+            buttonText: { displayText: movie.title },
+            type: 1
+        }));
+
+        // Store mapping to use later
+        global.movieResults = results;
+
+        await socket.sendMessage(sender, {
+            text: `🎬 Select a movie to download:\n\nSearch results for: *${query}*`,
+            buttons: buttons,
+            headerType: 1
+        });
+
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(sender, { text: '❌ Error fetching search results. Please try again later.' });
+    }
+    break;
+}
+
+// Handle movie selection button
+case /^movie_select_\d+$/.test(command) && command: {
+    const idx = parseInt(command.split('_')[2]);
+    const movie = global.movieResults?.[idx];
+    if (!movie) return await socket.sendMessage(sender, { text: '❌ Movie not found.' });
+
+    try {
+        // 2️⃣ Download API
+        const dlUrl = `https://apis.sandarux.sbs/api/download/sinhalasub-dl?q=${encodeURIComponent(movie.url)}`;
+        const dlRes = await axios.get(dlUrl);
+
+        const links = dlRes.data.links;
+        if (!links) return await socket.sendMessage(sender, { text: '❌ Download links not available.' });
+
+        // Buttons for download links
+        const buttons = [
+            { buttonId: `dl_mp4_${idx}`, buttonText: { displayText: 'MP4 🎥' }, type: 1 },
+            { buttonId: `dl_sub_${idx}`, buttonText: { displayText: 'Subtitle 📝' }, type: 1 },
+            { buttonId: `dl_audio_${idx}`, buttonText: { displayText: 'Audio 🎵' }, type: 1 }
+        ];
+
+        await socket.sendMessage(sender, {
+            text: `📥 Download links for *${dlRes.data.title}*:`,
+            buttons: buttons,
+            headerType: 1
+        });
+
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(sender, { text: '❌ Error fetching download links. Please try again later.' });
+    }
+    break;
+}
+
+// Handle download button clicks
+case /^dl_(mp4|sub|audio)_\d+$/.test(command) && command: {
+    const parts = command.split('_');
+    const type = parts[1]; // mp4 / sub / audio
+    const idx = parseInt(parts[2]);
+    const movie = global.movieResults?.[idx];
+    if (!movie) return await socket.sendMessage(sender, { text: '❌ Movie not found.' });
+
+    try {
+        const dlUrl = `https://apis.sandarux.sbs/api/download/sinhalasub-dl?q=${encodeURIComponent(movie.url)}`;
+        const dlRes = await axios.get(dlUrl);
+        const links = dlRes.data.links;
+
+        if (!links || !links[type]) return await socket.sendMessage(sender, { text: '❌ Link not available.' });
+
+        await socket.sendMessage(sender, { text: `Here is your *${type.toUpperCase()}* link:\n${links[type]}` });
+
+    } catch (err) {
+        console.error(err);
+        await socket.sendMessage(sender, { text: '❌ Error fetching download link. Please try again later.' });
+    }
+    break;
+}
+
             case 'npm': {
     const axios = require('axios');
 
