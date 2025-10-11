@@ -1415,65 +1415,7 @@ case 'facebook': {
 
                     });
                     break;
-                }
-        
-            case 'anime': {
-    const axios = require('axios');
-
-    async function fetchAnimeImage() {
-        try {
-            const apiUrl = 'https://api.waifu.pics/nsfw/neko';
-            const response = await axios.get(apiUrl);
-
-            // Verify response
-            if (!response.data || !response.data.url) {
-                await socket.sendMessage(sender, { text: '❌ Could not fetch anime image. API might be down.' });
-                return null;
-            }
-
-            return response.data.url;
-
-        } catch (error) {
-            console.error('API fetch error:', error);
-            await socket.sendMessage(sender, { text: '❌ Unable to fetch the anime image. Please try again later.' });
-            return null;
-        }
-    }
-
-    // Fetch initial image
-    const imageUrl = await fetchAnimeImage();
-    if (!imageUrl) return;
-
-    // Buttons
-    const buttons = [
-        { buttonId: '.anime', buttonText: { displayText: 'Next 🔄' }, type: 1 },
-        { buttonId: 'anime_download', buttonText: { displayText: 'Download 💾' }, type: 1 }
-    ];
-
-    const buttonMessage = {
-        image: { url: imageUrl },
-        caption: '*🔥 Random Anime Image 🚀*',
-        footer: 'BLOOD XMD Mini Bot',
-        buttons: buttons,
-        headerType: 4
-    };
-
-    await socket.sendMessage(sender, buttonMessage);
-    break;
-}
-
-// Next button handler
-case 'anime_next': {
-    // Call the same command again to get a new image
-    await socket.commands['anime'](sender, socket);
-    break;
-}
-
-// Download button handler
-case 'anime_download': {
-    await socket.sendMessage(sender, { text: '💾 To download the image, long press on it and save in WhatsApp.' });
-    break;
-}
+                }               
 
             case 'anime': {
     const category = args[0]?.toLowerCase() || 'waifu'; // default: waifu
