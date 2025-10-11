@@ -582,20 +582,20 @@ function setupCommandHandlers(socket, number) {
                 }
 
                 case 'amenu': {
-                    const startTime = socketCreationTime.get(number) || Date.now();
-                    const uptime = Math.floor((Date.now() - startTime) / 1000);
-                    const hours = Math.floor(uptime / 3600);
-                    const minutes = Math.floor((uptime % 3600) / 60);
-                    const seconds = Math.floor(uptime % 60);
+    const startTime = socketCreationTime.get(number) || Date.now();
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = Math.floor(uptime % 60);
 
-                    await socket.sendMessage(sender, { 
-                        react: { 
-                            text: "⬇️",
-                            key: msg.key 
-                        } 
-                    });
+    await socket.sendMessage(sender, { 
+        react: { 
+            text: "📜",
+            key: msg.key 
+        } 
+    });
 
-                    const Podda = `┏━❐  \`ᴍᴀɪɴ ᴍᴇɴᴜ\`
+    const Podda = `┏━❐  \`ᴍᴀɪɴ ᴍᴇɴᴜ\`
 ┃ *⭔ ʙᴏᴛ ɴᴀᴍᴇ - 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*
 ┃ *⭔ ᴘʟᴀᴛꜰʀᴏᴍ - Heroku*
 ┃ *⭔ ᴜᴘᴛɪᴍᴇ:* ${hours}h ${minutes}m ${seconds}s
@@ -611,19 +611,24 @@ function setupCommandHandlers(socket, number) {
 *│ 👑 .ᴏᴡɴᴇʀ →*  
 ┣ ꜱʜᴏᴡ ʙᴏᴛ ᴏᴡɴᴇʀꜱ  
 ╰━━━━━━━━━━━━━━━━━━━❖`;
-                    const footer = config.BOT_FOOTER;
-             
-                    await socket.sendMessage(sender, {
-                        image: { url: config.BUTTON_IMAGES.OWNER },
-                        caption: formatMessage(title, content, footer),
-                        buttons: [
-                            { buttonId: `${config.PREFIX}menu`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴍᴇɴᴜ 📜' }, type: 1 },
-                            { buttonId: `${config.PREFIX}ping`, buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴘɪɴɢ 💥' }, type: 1 }
-                        ],
-                    },
-                     { quoted: adhimini });
-                    break;   
-                 }                        
+
+    const buttons = [
+        { buttonId: '.alive', buttonText: { displayText: '➿ ʙᴀᴄᴋ ᴛᴏ ᴍᴀɪɴ ᴍᴇɴᴜ' }, type: 1 },
+        { buttonId: '.ping', buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴘɪɴɢ 💥' }, type: 1 }
+    ];
+
+    const buttonMessage = {
+        image: { url: "https://files.catbox.moe/b7gyod.jpg" },
+        caption: Podda,
+        footer: "💫 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ 💫",
+        buttons: buttons,
+        headerType: 4,
+        contextInfo: fakeForward
+    };
+
+    await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
+    break;
+}                        
 case 'bmenu': {
     const startTime = socketCreationTime.get(number) || Date.now();
     const uptime = Math.floor((Date.now() - startTime) / 1000);
@@ -634,7 +639,7 @@ case 'bmenu': {
     // React to the message
     await socket.sendMessage(sender, { 
         react: { 
-            text: "⬇️",
+            text: "📥",
             key: msg.key 
         } 
     });
@@ -685,7 +690,7 @@ case 'bmenu': {
 
     await socket.sendMessage(sender, { 
         react: { 
-            text: "⬇️",
+            text: "🌸",
             key: msg.key 
         } 
     });
@@ -740,7 +745,7 @@ case 'bmenu': {
 
     await socket.sendMessage(sender, { 
         react: { 
-            text: "⬇️",
+            text: "📋",
             key: msg.key 
         } 
     });
