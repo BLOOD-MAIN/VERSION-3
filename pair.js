@@ -1423,27 +1423,25 @@ case 'facebook': {
                     break;
                 }   
   
-           case 'xnxx': {
+           // === XNXX SEARCH CASE ===
+case 'xnxx': {
     const searchQuery = args.join(' ');
     if (!searchQuery) return await reply("🚩 *Please give me words to search*");
 
     try {
-        // Search XNXX (your existing xnxxs function)
         let searchResults = await xnxxs(searchQuery); // returns { result: [{ title, link }, ...] }
 
-        if (!searchResults || !searchResults.result || searchResults.result.length === 0) {
+        if (!searchResults?.result?.length) {
             return await reply("❌ No results found for: " + searchQuery);
         }
 
-        // Create list rows
-        const rows = searchResults.result.map((video, idx) => ({
+        const rows = searchResults.result.map(video => ({
             title: video.title,
             description: '',
             rowId: prefix + "xnxxdown " + video.link
         }));
 
         const sections = [{ title: "🔞 Search Results", rows }];
-
         const listMessage = {
             text: `*_XNXX SEARCH RESULT 🔞_*\n\n*Input:* ${searchQuery}`,
             footer: config.FOOTER,
@@ -1452,7 +1450,6 @@ case 'facebook': {
             sections
         };
 
-        // Send listMessage
         if (config.BUTTON === "true") {
             await socket.sendMessage(sender, {
                 image: { url: config.LOGO },
@@ -1482,32 +1479,29 @@ case 'facebook': {
     break;
 }
 
-// XNXX download handler
-case /^xnxxdown\s/.test(command) && command: {
+// === XNXX DOWNLOAD HANDLER ===
+if (command.startsWith(prefix + "xnxxdown ")) {
     const videoUrl = command.replace(prefix + "xnxxdown ", "").trim();
     if (!videoUrl) return await reply("❌ Invalid URL");
 
     try {
-        // Use xdl function to scrape video info
-        let videoData = await xdl(videoUrl); // returns { title, image, files: { low, high, HLS, thumb, ... } }
+        let videoData = await xdl(videoUrl); // { status: true, result: { title, image, duration, files: { low, high, HLS, thumb } } }
 
-        if (!videoData || !videoData.status) return await reply("❌ Unable to fetch video data");
+        if (!videoData?.status) return await reply("❌ Unable to fetch video data");
 
-        // Buttons for download qualities
         const buttons = [
             { buttonId: `xnxx_dl_low ${videoUrl}`, buttonText: { displayText: "Low Quality 🎬" }, type: 1 },
             { buttonId: `xnxx_dl_high ${videoUrl}`, buttonText: { displayText: "High Quality 🎥" }, type: 1 },
             { buttonId: `xnxx_dl_hls ${videoUrl}`, buttonText: { displayText: "HLS Stream 📺" }, type: 1 }
         ];
 
-        // Fake forward context
         const fakeForward = {
             forwardingScore: 999,
             isForwarded: true,
             externalAdReply: {
                 title: videoData.result.title,
                 body: `Duration: ${videoData.result.duration || 'N/A'}`,
-                thumbnailUrl: videoData.result.image || config.LOGO,
+                thumbnailUrl: videoData.result.files.thumb || videoData.result.image || config.LOGO,
                 mediaType: 2,
                 mediaUrl: videoUrl,
                 sourceUrl: videoUrl
@@ -1527,22 +1521,21 @@ case /^xnxxdown\s/.test(command) && command: {
         console.error(err);
         await reply("🚩 *Error fetching XNXX video details*");
     }
-    break;
 }
 
-// Download button handlers
-case /^xnxx_dl_(low|high|hls)\s/.test(command) && command: {
-    const [_, quality, url] = command.split(" ");
-    let dlUrl;
+// === DOWNLOAD BUTTON HANDLERS ===
+if (command.startsWith("xnxx_dl_")) {
+    const [prefixCmd, url] = command.split(" ").map(i => i.trim());
+    const quality = prefixCmd.split("_")[2]; // low | high | hls
+
     try {
         const videoData = await xdl(url);
-        if (!videoData || !videoData.status) return await reply("❌ Unable to fetch video data");
+        if (!videoData?.status) return await reply("❌ Unable to fetch video data");
 
-        switch (quality) {
-            case 'low': dlUrl = videoData.result.files.low; break;
-            case 'high': dlUrl = videoData.result.files.high; break;
-            case 'hls': dlUrl = videoData.result.files.HLS; break;
-        }
+        let dlUrl;
+        if (quality === "low") dlUrl = videoData.result.files.low;
+        else if (quality === "high") dlUrl = videoData.result.files.high;
+        else if (quality === "hls") dlUrl = videoData.result.files.HLS;
 
         if (!dlUrl) return await reply("❌ This quality is not available");
 
@@ -1552,7 +1545,6 @@ case /^xnxx_dl_(low|high|hls)\s/.test(command) && command: {
         console.error(err);
         await reply("🚩 Error downloading video");
     }
-    break;
 }   
 
             case 'nsfwneko': {
