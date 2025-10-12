@@ -836,14 +836,7 @@ case 'animemenu': {
             forwardedNewsletterMessageInfo: {
                 newsletterJid: "120363321230999999@newsletter",
                 serverMessageId: "",
-                newsletterName: "💮 BLOOD-XMD MINI • ANIME",
-            },
-            externalAdReply: {
-                title: "🎴 Anime Universe",
-                body: "💫 Powered by BLOOD-XMD MINI BOT 💫",
-                thumbnailUrl: "https://files.catbox.moe/lwdp9g.jpg",
-                mediaType: 1,
-                renderLargerThumbnail: true
+                newsletterName: "💮 BLOOD-XMD MINI • ANIME",                        
             }
         };
 
