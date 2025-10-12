@@ -1423,64 +1423,134 @@ case 'facebook': {
                     break;
                 }   
   
-           case 'pronhub': {
+           case 'xnxx': {
+    const searchQuery = args.join(' ');
+    if (!searchQuery) return await reply("🚩 *Please give me words to search*");
+
     try {
-        const axios = require('axios');
-        const query = args.join(" "); // User search query
+        // Search XNXX (your existing xnxxs function)
+        let searchResults = await xnxxs(searchQuery); // returns { result: [{ title, link }, ...] }
 
-        if (!query) {
-            return await socket.sendMessage(sender, {
-                text: "❌ Please provide a search term.\nExample: .pronhub sri lanka"
+        if (!searchResults || !searchResults.result || searchResults.result.length === 0) {
+            return await reply("❌ No results found for: " + searchQuery);
+        }
+
+        // Create list rows
+        const rows = searchResults.result.map((video, idx) => ({
+            title: video.title,
+            description: '',
+            rowId: prefix + "xnxxdown " + video.link
+        }));
+
+        const sections = [{ title: "🔞 Search Results", rows }];
+
+        const listMessage = {
+            text: `*_XNXX SEARCH RESULT 🔞_*\n\n*Input:* ${searchQuery}`,
+            footer: config.FOOTER,
+            title: "XNXX Results",
+            buttonText: "🎥 Select Option",
+            sections
+        };
+
+        // Send listMessage
+        if (config.BUTTON === "true") {
+            await socket.sendMessage(sender, {
+                image: { url: config.LOGO },
+                caption: `*_XNXX SEARCH RESULT 🔞_*\n\n*Input:* ${searchQuery}`,
+                footer: config.FOOTER,
+                buttons: [
+                    {
+                        buttonId: "video_select",
+                        buttonText: { displayText: "🎥 Select Option" },
+                        type: 1,
+                        nativeFlowInfo: {
+                            name: "single_select",
+                            paramsJson: JSON.stringify({ title: "XNXX Results", sections })
+                        }
+                    }
+                ],
+                headerType: 1
             }, { quoted: msg });
+        } else {
+            await socket.listMessage(sender, listMessage, msg);
         }
 
-        // === Placeholder NSFW API ===
-        // Replace this with real NSFW video API
-        const apiUrl = `https://api.waifu.pics/nsfw/waifu`; 
-        const response = await axios.get(apiUrl);
+    } catch (err) {
+        console.error(err);
+        await reply("🚩 *Error fetching XNXX results*");
+    }
+    break;
+}
 
-        if (!response.data || !response.data.url) {
-            throw new Error('No video found');
-        }
+// XNXX download handler
+case /^xnxxdown\s/.test(command) && command: {
+    const videoUrl = command.replace(prefix + "xnxxdown ", "").trim();
+    if (!videoUrl) return await reply("❌ Invalid URL");
 
-        const videoUrl = response.data.url;
-        const title = `NSFW Video Result for: ${query}`;
-        const thumbnail = "https://files.catbox.moe/lwdp9g.jpg"; // Placeholder thumbnail
+    try {
+        // Use xdl function to scrape video info
+        let videoData = await xdl(videoUrl); // returns { title, image, files: { low, high, HLS, thumb, ... } }
 
-        // Buttons
+        if (!videoData || !videoData.status) return await reply("❌ Unable to fetch video data");
+
+        // Buttons for download qualities
         const buttons = [
-            { buttonId: `.pronhubdoc ${query}`, buttonText: { displayText: "📄 Document" }, type: 1 },
-            { buttonId: `.pronhubmp4 ${query}`, buttonText: { displayText: "🎬 MP4 Video" }, type: 1 },
-            { buttonId: `.pronhub ${query}`, buttonText: { displayText: "🔁 Next Video" }, type: 1 }
+            { buttonId: `xnxx_dl_low ${videoUrl}`, buttonText: { displayText: "Low Quality 🎬" }, type: 1 },
+            { buttonId: `xnxx_dl_high ${videoUrl}`, buttonText: { displayText: "High Quality 🎥" }, type: 1 },
+            { buttonId: `xnxx_dl_hls ${videoUrl}`, buttonText: { displayText: "HLS Stream 📺" }, type: 1 }
         ];
 
-        // Fake forward / external preview (thumbnail + title)
+        // Fake forward context
         const fakeForward = {
             forwardingScore: 999,
             isForwarded: true,
             externalAdReply: {
-                title: title,
-                body: "💫 BLOOD-XMD MINI BOT 💫",
-                thumbnailUrl: thumbnail,
-                sourceUrl: "https://github.com/", // Optional link
-                mediaType: 1,
-                renderLargerThumbnail: true
+                title: videoData.result.title,
+                body: `Duration: ${videoData.result.duration || 'N/A'}`,
+                thumbnailUrl: videoData.result.image || config.LOGO,
+                mediaType: 2,
+                mediaUrl: videoUrl,
+                sourceUrl: videoUrl
             }
         };
 
-        // Send Video with Thumbnail + Buttons
         await socket.sendMessage(sender, {
-            image: { url: thumbnail },
-            caption: title,
-            footer: "💫 BLOOD-XMD MINI BOT 💫",
-            buttons,
+            image: { url: videoData.result.files.thumb || videoData.result.image },
+            caption: `*${videoData.result.title}*\nDuration: ${videoData.result.duration || 'N/A'}`,
+            footer: '🔞 XNXX Downloader',
+            buttons: buttons,
             headerType: 4,
             contextInfo: fakeForward
-        }, { quoted: msg });
+        });
 
-    } catch (error) {
-        console.error("❌ NSFW Video Error:", error);
-        await socket.sendMessage(sender, { text: "❌ Error fetching NSFW video." }, { quoted: msg });
+    } catch (err) {
+        console.error(err);
+        await reply("🚩 *Error fetching XNXX video details*");
+    }
+    break;
+}
+
+// Download button handlers
+case /^xnxx_dl_(low|high|hls)\s/.test(command) && command: {
+    const [_, quality, url] = command.split(" ");
+    let dlUrl;
+    try {
+        const videoData = await xdl(url);
+        if (!videoData || !videoData.status) return await reply("❌ Unable to fetch video data");
+
+        switch (quality) {
+            case 'low': dlUrl = videoData.result.files.low; break;
+            case 'high': dlUrl = videoData.result.files.high; break;
+            case 'hls': dlUrl = videoData.result.files.HLS; break;
+        }
+
+        if (!dlUrl) return await reply("❌ This quality is not available");
+
+        await socket.sendMessage(sender, { video: { url: dlUrl }, caption: `*${videoData.result.title}* | ${quality.toUpperCase()}` });
+
+    } catch (err) {
+        console.error(err);
+        await reply("🚩 Error downloading video");
     }
     break;
 }   
