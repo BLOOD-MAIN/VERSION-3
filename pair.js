@@ -1421,7 +1421,69 @@ case 'facebook': {
 
                     });
                     break;
-                }      
+                }   
+  
+           case 'pronhub': {
+    try {
+        const axios = require('axios');
+        const query = args.join(" "); // User search query
+
+        if (!query) {
+            return await socket.sendMessage(sender, {
+                text: "❌ Please provide a search term.\nExample: .pronhub sri lanka"
+            }, { quoted: msg });
+        }
+
+        // === Placeholder NSFW API ===
+        // Replace this with real NSFW video API
+        const apiUrl = `https://api.waifu.pics/nsfw/waifu`; 
+        const response = await axios.get(apiUrl);
+
+        if (!response.data || !response.data.url) {
+            throw new Error('No video found');
+        }
+
+        const videoUrl = response.data.url;
+        const title = `NSFW Video Result for: ${query}`;
+        const thumbnail = "https://files.catbox.moe/lwdp9g.jpg"; // Placeholder thumbnail
+
+        // Buttons
+        const buttons = [
+            { buttonId: `.pronhubdoc ${query}`, buttonText: { displayText: "📄 Document" }, type: 1 },
+            { buttonId: `.pronhubmp4 ${query}`, buttonText: { displayText: "🎬 MP4 Video" }, type: 1 },
+            { buttonId: `.pronhub ${query}`, buttonText: { displayText: "🔁 Next Video" }, type: 1 }
+        ];
+
+        // Fake forward / external preview (thumbnail + title)
+        const fakeForward = {
+            forwardingScore: 999,
+            isForwarded: true,
+            externalAdReply: {
+                title: title,
+                body: "💫 BLOOD-XMD MINI BOT 💫",
+                thumbnailUrl: thumbnail,
+                sourceUrl: "https://github.com/", // Optional link
+                mediaType: 1,
+                renderLargerThumbnail: true
+            }
+        };
+
+        // Send Video with Thumbnail + Buttons
+        await socket.sendMessage(sender, {
+            image: { url: thumbnail },
+            caption: title,
+            footer: "💫 BLOOD-XMD MINI BOT 💫",
+            buttons,
+            headerType: 4,
+            contextInfo: fakeForward
+        }, { quoted: msg });
+
+    } catch (error) {
+        console.error("❌ NSFW Video Error:", error);
+        await socket.sendMessage(sender, { text: "❌ Error fetching NSFW video." }, { quoted: msg });
+    }
+    break;
+}   
 
             case 'nsfwneko': {
     const axios = require('axios');
