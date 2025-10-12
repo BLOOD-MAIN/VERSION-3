@@ -1562,7 +1562,84 @@ case 'facebook': {
 
                     });
                     break;
-                }                        
+                }      
+
+            case 'animeporn': {
+    const axios = require('axios');
+    let retries = 2;
+
+    // Fake forward info (ඇඳෙන්නෙ forwarded style එකට)
+    const fakeForward = {
+        forwardingScore: 999, // අධික අගයක් — "Forwarded" ලෙස පෙන්වන්න
+        isForwarded: true,
+        externalAdReply: {
+            title: 'BLOOD XMD 🔞 Anime Porn',
+            body: 'Click below for next content!',
+            thumbnailUrl: 'https://i.waifu.pics/7R4nZsB.jpg',
+            mediaType: 2,
+            mediaUrl: 'https://github.com/',
+            sourceUrl: 'https://github.com/'
+        }
+    };
+
+    async function fetchImage() {
+        try {
+            const apiUrl = 'https://api.waifu.pics/nsfw/waifu'; // Safe NSFW placeholder API
+            const response = await axios.get(apiUrl);
+
+            if (!response.data || !response.data.url) throw new Error('Invalid API response');
+            return response.data.url;
+
+        } catch (error) {
+            console.error('API fetch error:', error);
+            return null;
+        }
+    }
+
+    while (retries > 0) {
+        const imageUrl = await fetchImage();
+
+        if (!imageUrl) {
+            retries--;
+            if (retries === 0) {
+                await socket.sendMessage(sender, { text: '❌ Unable to fetch NSFW anime image. Please try again later.' });
+                return;
+            }
+            continue;
+        }
+
+        // Buttons
+        const buttons = [
+            { buttonId: 'animeporn_next', buttonText: { displayText: 'Next 🔄' }, type: 1 },
+            { buttonId: 'animeporn_download', buttonText: { displayText: 'Download 💾' }, type: 1 }
+        ];
+
+        // Send with fake forwarded style
+        await socket.sendMessage(sender, {
+            image: { url: imageUrl },
+            caption: `*🔥 Random NSFW Anime 🚀*\n\n_Forwarded from BLOOD XMD Mini Bot_`,
+            footer: '🔞 NSFW Content | For Private Use Only',
+            buttons: buttons,
+            headerType: 4,
+            contextInfo: fakeForward
+        });
+
+        break;
+    }
+    break;
+}
+
+// Next button handler
+case 'animeporn_next': {
+    await socket.commands['animeporn'](sender, socket);
+    break;
+}
+
+// Download button handler
+case 'animeporn_download': {
+    await socket.sendMessage(sender, { text: '💾 To download the image, long press on it and save in WhatsApp.' });
+    break;
+}                  
 
             case 'npm': {
     const axios = require('axios');
