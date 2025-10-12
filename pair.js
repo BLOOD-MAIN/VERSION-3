@@ -1423,54 +1423,32 @@ case 'facebook': {
                     break;
                 }   
   
-           // === XNXX SEARCH CASE ===
+          // === XNXX SEARCH CASE WITH NORMAL BUTTONS ===
 case 'xnxx': {
     const searchQuery = args.join(' ');
     if (!searchQuery) return await reply("🚩 *Please give me words to search*");
 
     try {
-        let searchResults = await xnxxs(searchQuery); // returns { result: [{ title, link }, ...] }
+        const searchResults = await xnxxs(searchQuery); // { result: [{ title, link }] }
 
         if (!searchResults?.result?.length) {
             return await reply("❌ No results found for: " + searchQuery);
         }
 
-        const rows = searchResults.result.map(video => ({
-            title: video.title,
-            description: '',
-            rowId: prefix + "xnxxdown " + video.link
+        // Prepare buttons for first 5 results
+        const buttons = searchResults.result.slice(0, 5).map(video => ({
+            buttonId: prefix + "xnxxdown " + video.link,
+            buttonText: { displayText: video.title },
+            type: 1
         }));
 
-        const sections = [{ title: "🔞 Search Results", rows }];
-        const listMessage = {
-            text: `*_XNXX SEARCH RESULT 🔞_*\n\n*Input:* ${searchQuery}`,
+        await socket.sendMessage(sender, {
+            image: { url: config.LOGO },
+            caption: `*_XNXX SEARCH RESULTS 🔞_*\n\n*Input:* ${searchQuery}\n\nSelect a video below:`,
             footer: config.FOOTER,
-            title: "XNXX Results",
-            buttonText: "🎥 Select Option",
-            sections
-        };
-
-        if (config.BUTTON === "true") {
-            await socket.sendMessage(sender, {
-                image: { url: config.LOGO },
-                caption: `*_XNXX SEARCH RESULT 🔞_*\n\n*Input:* ${searchQuery}`,
-                footer: config.FOOTER,
-                buttons: [
-                    {
-                        buttonId: "video_select",
-                        buttonText: { displayText: "🎥 Select Option" },
-                        type: 1,
-                        nativeFlowInfo: {
-                            name: "single_select",
-                            paramsJson: JSON.stringify({ title: "XNXX Results", sections })
-                        }
-                    }
-                ],
-                headerType: 1
-            }, { quoted: msg });
-        } else {
-            await socket.listMessage(sender, listMessage, msg);
-        }
+            buttons: buttons,
+            headerType: 4
+        });
 
     } catch (err) {
         console.error(err);
@@ -1479,13 +1457,13 @@ case 'xnxx': {
     break;
 }
 
-// === XNXX DOWNLOAD HANDLER ===
+// === XNXX DOWNLOAD CASE WITH BUTTONS ===
 if (command.startsWith(prefix + "xnxxdown ")) {
     const videoUrl = command.replace(prefix + "xnxxdown ", "").trim();
     if (!videoUrl) return await reply("❌ Invalid URL");
 
     try {
-        let videoData = await xdl(videoUrl); // { status: true, result: { title, image, duration, files: { low, high, HLS, thumb } } }
+        const videoData = await xdl(videoUrl); // { status: true, result: { title, image, duration, files: { low, high, HLS, thumb } } }
 
         if (!videoData?.status) return await reply("❌ Unable to fetch video data");
 
@@ -1495,26 +1473,12 @@ if (command.startsWith(prefix + "xnxxdown ")) {
             { buttonId: `xnxx_dl_hls ${videoUrl}`, buttonText: { displayText: "HLS Stream 📺" }, type: 1 }
         ];
 
-        const fakeForward = {
-            forwardingScore: 999,
-            isForwarded: true,
-            externalAdReply: {
-                title: videoData.result.title,
-                body: `Duration: ${videoData.result.duration || 'N/A'}`,
-                thumbnailUrl: videoData.result.files.thumb || videoData.result.image || config.LOGO,
-                mediaType: 2,
-                mediaUrl: videoUrl,
-                sourceUrl: videoUrl
-            }
-        };
-
         await socket.sendMessage(sender, {
-            image: { url: videoData.result.files.thumb || videoData.result.image },
+            image: { url: videoData.result.files.thumb || videoData.result.image || config.LOGO },
             caption: `*${videoData.result.title}*\nDuration: ${videoData.result.duration || 'N/A'}`,
             footer: '🔞 XNXX Downloader',
             buttons: buttons,
-            headerType: 4,
-            contextInfo: fakeForward
+            headerType: 4
         });
 
     } catch (err) {
@@ -1539,12 +1503,15 @@ if (command.startsWith("xnxx_dl_")) {
 
         if (!dlUrl) return await reply("❌ This quality is not available");
 
-        await socket.sendMessage(sender, { video: { url: dlUrl }, caption: `*${videoData.result.title}* | ${quality.toUpperCase()}` });
+        await socket.sendMessage(sender, {
+            video: { url: dlUrl },
+            caption: `*${videoData.result.title}* | ${quality.toUpperCase()}`
+        });
 
     } catch (err) {
         console.error(err);
         await reply("🚩 Error downloading video");
-    }
+    break;
 }   
 
             case 'nsfwneko': {
