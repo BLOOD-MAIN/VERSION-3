@@ -823,7 +823,7 @@ case 'animemenu': {
         // 💫 Buttons
         const buttons = [
             { buttonId: '.waifu', buttonText: { displayText: 'ᴀɴɪᴍᴇ ɢɪʀʟ ᴡᴀɪꜰᴜ 🩷' }, type: 1 },
-            { buttonId: '.neko', buttonText: { displayText: 'ᴀɴɪᴍᴇ ɢɪʀʟ ɴᴇᴋᴏ 🐱' }, type: 1 },
+            { buttonId: '.neko', buttonText: { displayText: 'ᴀɴɪᴍᴇ boy picture 🐱' }, type: 1 },
             { buttonId: '.nsfwneko', buttonText: { displayText: 'ᴀᴅᴜʟᴛ ᴀɴɪᴍᴇ ɢɪʀʟ ⚠️' }, type: 1 },            
             { buttonId: '.menu', buttonText: { displayText: '➿ ʙᴀᴄᴋ ᴛᴏ ᴍᴀɪɴ ᴍᴇɴᴜ' }, type: 1 }
         ];
@@ -1469,8 +1469,8 @@ case 'facebook': {
 
         // Buttons
         const buttons = [
-            { buttonId: 'animeporn_next', buttonText: { displayText: 'Next 🔄' }, type: 1 },
-            { buttonId: 'animeporn_download', buttonText: { displayText: 'Download 💾' }, type: 1 }
+            { buttonId: '.nsfwneko', buttonText: { displayText: 'ɴᴇxᴛ ɪᴍᴀɢᴇ 🔄' }, type: 1 },
+            { buttonId: 'animeporn_download', buttonText: { displayText: 'ᴅᴏᴡɴʟᴏᴀʀᴅ ɪᴍᴀɢᴇ 💾' }, type: 1 }
         ];
 
         // Send with fake forwarded style
@@ -1520,7 +1520,7 @@ case 'animeporn_download': {
 
     async function fetchImage() {
         try {
-            const apiUrl = 'https://api.waifu.pics/nsfw/waifu'; // Safe NSFW placeholder API
+            const apiUrl = 'https://api.waifu.pics/sfw/waifu'; // Safe NSFW placeholder API
             const response = await axios.get(apiUrl);
 
             if (!response.data || !response.data.url) throw new Error('Invalid API response');
@@ -1546,8 +1546,8 @@ case 'animeporn_download': {
 
         // Buttons
         const buttons = [
-            { buttonId: 'animeporn_next', buttonText: { displayText: 'Next 🔄' }, type: 1 },
-            { buttonId: 'animeporn_download', buttonText: { displayText: 'Download 💾' }, type: 1 }
+            { buttonId: '.waifu', buttonText: { displayText: 'ɴᴇxᴛ ɪᴍᴀɢᴇ 🔄' }, type: 1 },
+            { buttonId: 'animeporn_download', buttonText: { displayText: 'ᴅᴏᴡɴʟᴏᴀᴅ ɪᴍᴀɢᴇ 💾' }, type: 1 }
         ];
 
         // Send with fake forwarded style
@@ -1597,7 +1597,7 @@ case 'animeporn_download': {
 
     async function fetchImage() {
         try {
-            const apiUrl = 'https://api.waifu.pics/nsfw/waifu'; // Safe NSFW placeholder API
+            const apiUrl = 'https://nekos.best/api/v2/male'; // Safe NSFW placeholder API
             const response = await axios.get(apiUrl);
 
             if (!response.data || !response.data.url) throw new Error('Invalid API response');
@@ -1623,8 +1623,8 @@ case 'animeporn_download': {
 
         // Buttons
         const buttons = [
-            { buttonId: 'animeporn_next', buttonText: { displayText: 'Next 🔄' }, type: 1 },
-            { buttonId: 'animeporn_download', buttonText: { displayText: 'Download 💾' }, type: 1 }
+            { buttonId: '.neko', buttonText: { displayText: 'ɴᴇxᴛ ɪᴍᴀɢᴇ 🔄' }, type: 1 },
+            { buttonId: 'animeporn_download', buttonText: { displayText: 'ᴅᴏᴡɴʟᴏᴀᴅ ɪᴍᴀɢᴇ 💾' }, type: 1 }
         ];
 
         // Send with fake forwarded style
