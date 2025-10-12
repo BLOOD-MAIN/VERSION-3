@@ -829,21 +829,25 @@ case 'animemenu': {
             { buttonId: '.menu', buttonText: { displayText: '🔙 Back to Menu' }, type: 1 }
         ];
 
-        // 🧩 Optional fake forward context (beautiful forwarded look)
+        // 🧩 Fake Forward (same style as dmenu)
         const fakeForward = {
-            forwardingScore: 999,
+            forwardingScore: 1000,
             isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+                newsletterJid: "120363321230999999@newsletter",
+                serverMessageId: "",
+                newsletterName: "💮 BLOOD-XMD MINI • ANIME",
+            },
             externalAdReply: {
                 title: "🎴 Anime Universe",
-                body: "💫 BLOOD-XMD MINI BOT 💫",
+                body: "💫 Powered by BLOOD-XMD MINI BOT 💫",
                 thumbnailUrl: "https://files.catbox.moe/lwdp9g.jpg",
-                sourceUrl: "https://github.com/",
                 mediaType: 1,
                 renderLargerThumbnail: true
             }
         };
 
-        // 📩 Send message with image & buttons
+        // 📩 Send message
         const buttonMessage = {
             image: { url: "https://files.catbox.moe/lwdp9g.jpg" },
             caption: animeMenuText,
