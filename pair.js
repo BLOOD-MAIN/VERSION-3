@@ -1421,7 +1421,83 @@ case 'facebook': {
 
                     });
                     break;
-                }   
+                }  
+
+           // ================= XNXX SEARCH CASE =================
+case 'xnxx': {
+  try {
+    // Permission check
+    if (config.XNXX_BLOCK === "true" && !isMe && !isSudo && !isOwner) {
+      await socket.sendMessage(from, { react: { text: '❌', key: msg.key } });
+      return await socket.sendMessage(from, { 
+        text: "This command currently works only for the Bot owner." 
+      }, { quoted: msg });
+    }
+
+    // Input validation
+    const query = args.join(" ");
+    if (!query) return reply("🚩 Please provide search words.");
+
+    // Fetch search results
+    const searchResults = await xnxxs(query); // Ensure this returns { result: [{title, link}, ...] }
+    if (!searchResults || !searchResults.result || searchResults.result.length === 0) {
+      return reply("❌ No results found for: " + query);
+    }
+
+    // Prepare normal buttons (max 5 per WhatsApp limitation)
+    const buttons = searchResults.result.slice(0, 5).map((item, index) => ({
+      buttonId: prefix + "xnxxdown " + item.link,
+      buttonText: { displayText: `${index + 1}. ${item.title}` },
+      type: 1
+    }));
+
+    // Send search results with normal buttons
+    await socket.sendMessage(from, {
+      text: `🔞 XNXX SEARCH RESULTS\n\n*Input:* ${query}`,
+      footer: config.FOOTER,
+      buttons: buttons,
+      headerType: 1
+    }, { quoted: msg });
+
+  } catch (err) {
+    console.error(err);
+    await socket.sendMessage(from, { text: "🚩 Error occurred while searching!" }, { quoted: msg });
+  }
+  break;
+}
+
+// ================= XNXX DOWNLOAD CASE =================
+case 'xnxxdown': {
+  try {
+    const url = args[0];
+    if (!url) return reply("🚩 Please provide a valid XNXX video link.");
+
+    // Fetch video info
+    const videoData = await xdl(url);
+    if (!videoData.status) return reply("❌ Failed to fetch video info.");
+
+    const { title, duration, thumbnail, files } = videoData.result;
+
+    // Send video preview with download buttons
+    const downloadButtons = [];
+    if (files.low) downloadButtons.push({ buttonId: `download_low ${url}`, buttonText: { displayText: "📥 Low Quality" }, type: 1 });
+    if (files.high) downloadButtons.push({ buttonId: `download_high ${url}`, buttonText: { displayText: "📥 High Quality" }, type: 1 });
+    if (files.hls) downloadButtons.push({ buttonId: `download_hls ${url}`, buttonText: { displayText: "📥 HLS Stream" }, type: 1 });
+
+    await socket.sendMessage(from, {
+      image: { url: thumbnail },
+      caption: `🎬 *${title}*\n⏱ Duration: ${duration}`,
+      footer: config.FOOTER,
+      buttons: downloadButtons.slice(0, 5),
+      headerType: 4
+    }, { quoted: msg });
+
+  } catch (err) {
+    console.error(err);
+    await socket.sendMessage(from, { text: "🚩 Error occurred while downloading!" }, { quoted: msg });
+  }
+  break;
+} 
 
             case 'nsfwneko': {
     const axios = require('axios');
