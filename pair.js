@@ -799,7 +799,7 @@ case 'animemenu': {
         // 🎌 Reaction
         await socket.sendMessage(sender, { 
             react: { 
-                text: "🎌", 
+                text: "😻", 
                 key: msg.key 
             } 
         });
@@ -822,25 +822,12 @@ case 'animemenu': {
 
         // 💫 Buttons
         const buttons = [
-            { buttonId: '.waifu', buttonText: { displayText: '💖 Waifu' }, type: 1 },
-            { buttonId: '.neko', buttonText: { displayText: '🐱 Neko' }, type: 1 },
-            { buttonId: '.nsfwneko', buttonText: { displayText: '⚠️ NSFW Neko' }, type: 1 },
-            { buttonId: '.randomanime', buttonText: { displayText: '🎨 Random Anime' }, type: 1 },
-            { buttonId: '.menu', buttonText: { displayText: '🔙 Back to Menu' }, type: 1 }
+            { buttonId: '.waifu', buttonText: { displayText: 'ᴀɴɪᴍᴇ ɢɪʀʟ ᴡᴀɪꜰᴜ 🩷' }, type: 1 },
+            { buttonId: '.neko', buttonText: { displayText: 'ᴀɴɪᴍᴇ ɢɪʀʟ ɴᴇᴋᴏ 🐱' }, type: 1 },
+            { buttonId: '.nsfwneko', buttonText: { displayText: 'ᴀᴅᴜʟᴛ ᴀɴɪᴍᴇ ɢɪʀʟ ⚠️' }, type: 1 },            
+            { buttonId: '.menu', buttonText: { displayText: '➿ ʙᴀᴄᴋ ᴛᴏ ᴍᴀɪɴ ᴍᴇɴᴜ' }, type: 1 }
         ];
 
-        // 🧩 Fake Forward (same style as dmenu)
-        const fakeForward = {
-            forwardingScore: 1000,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-                newsletterJid: "120363321230999999@newsletter",
-                serverMessageId: "",
-                newsletterName: "💮 BLOOD-XMD MINI • ANIME",                        
-            }
-        };
-
-        // 📩 Send message
         const buttonMessage = {
             image: { url: "https://files.catbox.moe/lwdp9g.jpg" },
             caption: animeMenuText,
