@@ -531,6 +531,14 @@ function setupCommandHandlers(socket, number) {
                     const minutes = Math.floor((uptime % 3600) / 60);
                     const seconds = Math.floor(uptime % 60);
 
+                await socket.sendMessage(sender, { 
+        react: { 
+            text: "🟥",
+            key: msg.key 
+        } 
+    });
+
+                
                     const title = '*HI 👋* *${pushwish}*\n┏━━━━ ◉◉ `ʜᴇʟʟᴏᴡ`━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝';
                     const content = '𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n' +
 
