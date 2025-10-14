@@ -533,7 +533,7 @@ function setupCommandHandlers(socket, number) {
 
                 await socket.sendMessage(sender, { 
         react: { 
-            text: "🟥",
+            text: "📁",
             key: msg.key 
         } 
     });
