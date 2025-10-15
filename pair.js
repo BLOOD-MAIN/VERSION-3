@@ -956,21 +956,54 @@ case 'capedit': {
 }
 
 case 'autoreply': {
-  if (!settings.AUTO_REPLY) return; // auto reply disabled
+    const axios = require("axios");
 
-  const msgText = msg.message?.conversation?.toLowerCase() || "";
-  
-  const replyMapping = {
-    "hi": "Hello! How can I help you today?",
-    "hello": "Hey! How are you?",
-    "help": "Sure! Send !menu to see options."
-  };
+    const GEMINI_API_KEY = 'AIzaSyBdBivCo6jWSchTb8meP7VyxbHpoNY_qfQ'; // ඔබේ API Key
+    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-  const reply = Object.keys(replyMapping).find(k => msgText.includes(k));
-  if (reply) {
-    await socket.sendMessage(sender, { text: replyMapping[reply] });
-  }
-  break;
+    // ✅ Get user message from any type
+    const userMessage = msg.message?.conversation || 
+                        msg.message?.extendedTextMessage?.text || 
+                        msg.message?.imageMessage?.caption || 
+                        msg.message?.videoMessage?.caption || 
+                        '';
+
+    if (!userMessage || userMessage.trim() === '') {
+        return await socket.sendMessage(sender, { text: "⚠️ Please send a message to get auto reply." }, { quoted: msg });
+    }
+
+    // ✅ Custom Gemini prompt for auto-reply
+    const prompt = `ඔබ සැබෑ මිනිසෙක් වගේ හැසිරෙන්න. User එකෙන් ලැබුණු පනිවිඩය: "${userMessage}". 
+    ඔබේ පිළිතුරු අකුරු 100 ට වැඩි නොවන ලෙස සීමා කරන්න. 
+    ඉමෝජි තිබේ නම්, ඉමෝජි වලින් පිළිතුරු දෙන්න. සාමාන්‍ය ආයුබෝවන් වගේ වචන වලට පිළිතුරු නොදෙන්න.`;
+
+    const payload = {
+        contents: [{
+            parts: [{ text: prompt }]
+        }]
+    };
+
+    try {
+        const response = await axios.post(GEMINI_API_URL, payload, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const aiReply = response?.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!aiReply) {
+            return await socket.sendMessage(sender, { text: "❌ Auto reply failed." }, { quoted: msg });
+        }
+
+        // ✅ Send auto reply
+        await socket.sendMessage(sender, { text: aiReply }, { quoted: msg });
+
+    } catch (err) {
+        console.error("Gemini Auto Reply Error:", err.response?.data || err.message);
+        await socket.sendMessage(sender, { text: "❌ Error generating auto reply." }, { quoted: msg });
+    }
+    break;
 }
 
            case 'vv': {
