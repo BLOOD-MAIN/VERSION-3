@@ -1814,7 +1814,26 @@ case 'animeporn_download': {
     }
 
     break;
-}    
+}   
+
+case 'autoreply': {
+  if (!settings.AUTO_REPLY) return; // auto reply disabled
+
+  const msgText = msg.message?.conversation?.toLowerCase() || "";
+  
+  const replyMapping = {
+    "hi": "Hello! How can I help you today?",
+    "hello": "Hey! How are you?",
+    "help": "Sure! Send !menu to see options."
+  };
+
+  const reply = Object.keys(replyMapping).find(k => msgText.includes(k));
+  if (reply) {
+    await socket.sendMessage(sender, { text: replyMapping[reply] });
+  }
+  break;
+}
+ 
    case 'tiktoksearch': {
     const axios = require('axios');
 
@@ -1977,6 +1996,9 @@ case 'settings': {
 
 5.1 ❤️ AUTO LIKE STATUS : ON
 5.2 💔 AUTO LIKE STATUS : OFF
+
+6.1 🎵
+6.2 🙂
 `;
 
     const menuMsg = await socket.sendMessage(sender, {
@@ -1996,6 +2018,8 @@ case 'settings': {
       "4.2": ["AUTO_VIEW_STATUS", "off", "🚫 AUTO VIEW STATUS : OFF"],
       "5.1": ["AUTO_LIKE_STATUS", "on", "❤️ AUTO LIKE STATUS : ON"],
       "5.2": ["AUTO_LIKE_STATUS", "off", "💔 AUTO LIKE STATUS : OFF"]
+      "6.1": ["AUTO_REPLY", "on", "🤖 AUTO REPLY : ON"],
+      "6.2": ["AUTO_REPLY", "off", "🚫 AUTO REPLY : OFF"]
     };
 
     const handler = async (msgUpdate) => {
