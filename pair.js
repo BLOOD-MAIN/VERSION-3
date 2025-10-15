@@ -539,7 +539,7 @@ function setupCommandHandlers(socket, number) {
     });
 
                 
-                    const title = '*HI 👋* *${pushwish}*\n┏━━━━ ◉◉ `ʜᴇʟʟᴏᴡ`━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝';
+                    const title = '*HI 👋* *BLOOD XMD MINI BOT USER 😻🩷*\n┏━━━━ ◉◉ `ʜᴇʟʟᴏᴡ`━━━━ ◉◉➢\n┣ *🧚‍♂️ Name: 𝐁ʟᴏᴏᴅ 𝐗ᴍᴅ 𝐌ɪɴɪ*\n┣ *🌐 Type:* ᴍɪɴɪ ʙᴏᴛ\n┣ *👨‍💻 Owners:* 𝐒ᴀᴄʜɪᴛʜʀᴀ 𝐌ᴀᴅᴜꜱᴀɴᴋᴀɪ\n┗━⚝';
                     const content = '𓊈 𝙱𝙻𝙾𝙾𝙳 𝚇𝙼𝙳 𝙼𝙸𝙽𝙸 𝐁𝐎𝐓 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒 𓊉\n' +
 
                    '╭─〔  S T A T U S  🥷 〕─╮\n' +
@@ -1246,10 +1246,10 @@ case 'song': {
 
     const caption = `🎶 *ʙʟᴏᴏᴅ x ᴍᴅ ᴍɪɴɪ ʙᴏᴛ ꜱᴏɴɢ ᴅᴏᴡɴʟᴏᴀᴅ* 🎧
 
-*📋 නම ➟* ${data.title}
-*⏱️ කාලය ➟* ${data.timestamp}
-*📅 නිකුත් දිනය ➟* ${data.ago}
-*👀 පෙනුම් ➟* ${data.views}
+*📋 𝘕𝘈𝘔𝘌 ➟* ${data.title}
+*⏱️ 𝘛𝘐𝘔𝘌 ➟* ${data.timestamp}
+*📅 𝘙𝘌𝘓𝘌𝘈𝘚 𝘋𝘈𝘛𝘌 ➟* ${data.ago}
+*👀 𝘝𝘐𝘌𝘞𝘚 ➟* ${data.views}
 *📎 URL ➟* ${ytUrl}
 
 > 𝘉𝘓𝘖𝘖𝘋-𝘟-𝘔ᴅ-𝘔ɪɴɪ-𝘉ᴏᴛ 💚🔥`;
@@ -1625,7 +1625,7 @@ case 'animeporn_download': {
         forwardingScore: 999, // අධික අගයක් — "Forwarded" ලෙස පෙන්වන්න
         isForwarded: true,
         externalAdReply: {
-            title: 'BLOOD XMD 🔞 Anime Porn',
+            title: 'BLOOD XMD 🩷 waifu Anime Picture',
             body: 'Click below for next content!',
             thumbnailUrl: 'https://i.waifu.pics/7R4nZsB.jpg',
             mediaType: 2,
@@ -1669,8 +1669,8 @@ case 'animeporn_download': {
         // Send with fake forwarded style
         await socket.sendMessage(sender, {
             image: { url: imageUrl },
-            caption: `*🔥 Random NSFW Anime 🚀*\n\n_Forwarded from BLOOD XMD Mini Bot_`,
-            footer: '🔞 NSFW Content | For Private Use Only',
+            caption: `*🔥 Random waifu Anime picture 🚀*\n\n_Forwarded from BLOOD XMD Mini Bot_`,
+            footer: '🩷 waifu Anime Content | For Favorite  Use Only',
             buttons: buttons,
             headerType: 4,
             contextInfo: fakeForward
@@ -1702,7 +1702,7 @@ case 'animeporn_download': {
         forwardingScore: 999, // අධික අගයක් — "Forwarded" ලෙස පෙන්වන්න
         isForwarded: true,
         externalAdReply: {
-            title: 'BLOOD XMD 🔞 Anime Porn',
+            title: 'BLOOD XMD 🥷 Neko Anime Picture',
             body: 'Click below for next content!',
             thumbnailUrl: 'https://i.waifu.pics/7R4nZsB.jpg',
             mediaType: 2,
@@ -1746,8 +1746,8 @@ case 'animeporn_download': {
         // Send with fake forwarded style
         await socket.sendMessage(sender, {
             image: { url: imageUrl },
-            caption: `*🔥 Random NSFW Anime 🚀*\n\n_Forwarded from BLOOD XMD Mini Bot_`,
-            footer: '🔞 NSFW Content | For Private Use Only',
+            caption: `*🔥 Random Neko Anime Picture 🚀*\n\n_Forwarded from BLOOD XMD Mini Bot_`,
+            footer: '🥷 Neko Anime Content | For Favorite Use Only',
             buttons: buttons,
             headerType: 4,
             contextInfo: fakeForward
