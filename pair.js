@@ -955,6 +955,24 @@ case 'capedit': {
     break;
 }
 
+case 'autoreply': {
+  if (!settings.AUTO_REPLY) return; // auto reply disabled
+
+  const msgText = msg.message?.conversation?.toLowerCase() || "";
+  
+  const replyMapping = {
+    "hi": "Hello! How can I help you today?",
+    "hello": "Hey! How are you?",
+    "help": "Sure! Send !menu to see options."
+  };
+
+  const reply = Object.keys(replyMapping).find(k => msgText.includes(k));
+  if (reply) {
+    await socket.sendMessage(sender, { text: replyMapping[reply] });
+  }
+  break;
+}
+
            case 'vv': {
     try {
         if (!msg.message?.extendedTextMessage?.contextInfo?.quotedMessage) {
