@@ -955,81 +955,40 @@ case 'capedit': {
     break;
 }
 
-// ⚡️ Auto-reply toggle state
-let autoReplyEnabled = true;
+case 'autoreply': {
+  try {
+    // Check if Auto Reply is ON
+    if (!settings.AUTO_REPLY) return;
 
-socket.on('message', async (msg) => {
-    const sender = msg.key.remoteJid;
-    const userMessage = msg.message?.conversation || 
-                        msg.message?.extendedTextMessage?.text || 
-                        msg.message?.imageMessage?.caption || 
-                        msg.message?.videoMessage?.caption || 
-                        '';
-    if (!userMessage || userMessage.trim() === '') return;
+    // Get message text (supports private & group messages)
+    const msgText = msg.message?.conversation
+                 || msg.message?.extendedTextMessage?.text
+                 || "";
+    if (!msgText) return;
 
-    // ✅ Ignore messages from self
-    if (msg.key.fromMe) return;
+    // Predefined keyword replies
+    const replyMapping = {
+      "hi": "Hello! How can I help you today?",
+      "hello": "Hey! How are you?",
+      "help": "Sure! Send !menu to see available commands.",
+      "good morning": "Good morning! ☀️ Have a great day!",
+      "good night": "Good night! 🌙 Sleep well!"
+    };
 
-    const args = userMessage.trim().split(' ');
-    const command = args[0].toLowerCase();
+    // Case-insensitive match
+    const keyword = Object.keys(replyMapping).find(k =>
+      msgText.toLowerCase().includes(k.toLowerCase())
+    );
 
-    switch(command) {
-
-        // ==============================
-        // 🛠 Auto-reply on/off
-        // ==============================
-        case '.autoreply': {
-            const action = args[1]?.toLowerCase();
-            if (action === 'on') {
-                autoReplyEnabled = true;
-                await socket.sendMessage(sender, { text: '✅ Auto-reply is now ON.' }, { quoted: msg });
-            } else if (action === 'off') {
-                autoReplyEnabled = false;
-                await socket.sendMessage(sender, { text: '❌ Auto-reply is now OFF.' }, { quoted: msg });
-            } else {
-                await socket.sendMessage(sender, { text: 'ℹ️ Use ".autoreply on" or ".autoreply off".' }, { quoted: msg });
-            }
-            break;
-        }
-
-        // ==============================
-        // ⚡️ Gemini Auto-reply
-        // ==============================
-        default: {
-            if (!autoReplyEnabled) return;
-
-            const axios = require("axios");
-            const GEMINI_API_KEY = 'AIzaSyBdBivCo6jWSchTb8meP7VyxbHpoNY_qfQ';
-            const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
-
-            const prompt = `ඔබ සැබෑ මිනිසෙක් වගේ හැසිරෙන්න. User එකෙන් ලැබුණු පනිවිඩය: "${userMessage}". 
-            ඔබේ පිළිතුරු අකුරු 100 ට වැඩි නොවන ලෙස සීමා කරන්න. 
-            ඉමෝජි තිබේ නම්, ඉමෝජි වලින් පිළිතුරු දෙන්න. සාමාන්‍ය ආයුබෝවන් වගේ වචන වලට පිළිතුරු නොදෙන්න.`;
-
-            const payload = {
-                contents: [{
-                    parts: [{ text: prompt }]
-                }]
-            };
-
-            try {
-                const response = await axios.post(GEMINI_API_URL, payload, {
-                    headers: { "Content-Type": "application/json" }
-                });
-
-                const aiReply = response?.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!aiReply) return;
-
-                await socket.sendMessage(sender, { text: aiReply }, { quoted: msg });
-
-            } catch (err) {
-                console.error("Gemini Auto Reply Error:", err.response?.data || err.message);
-            }
-            break;
-        }
+    if (keyword) {
+      await socket.sendMessage(sender, { text: replyMapping[keyword] });
     }
-});
 
+  } catch (err) {
+    console.error("Auto Reply Error:", err);
+  }
+  break;
+}
            case 'vv': {
     try {
         if (!msg.message?.extendedTextMessage?.contextInfo?.quotedMessage) {
