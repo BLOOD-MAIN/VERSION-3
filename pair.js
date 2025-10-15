@@ -1341,65 +1341,56 @@ case 'mp3ptt': {
 case 'fb':
 case 'fbdl':
 case 'facebook': {
-    const getFBInfo = require('@xaviabot/fb-downloader');
+  try {
+    const fbUrl = args.join(" ");
+    if (!fbUrl)
+      return reply("💭 *ඔයාට Facebook video / reel link එකක් දෙන්න!* 🌐");
 
-    if (!args[0] || !args[0].startsWith('http')) {
-        return await socket.sendMessage(from, {
-            text: `❎ *Please provide a valid Facebook video link.*\n\n📌 Example: .fb https://fb.watch/abcd1234/`
-        }, { quoted: msg });
+    const axios = require("axios");
+    const apiKey = "e276311658d835109c";
+    const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
+
+    const response = await axios.get(apiUrl);
+    const result = response.data.result;
+
+    if (!result || (!result.sd && !result.hd)) {
+      return reply("❌ *Invalid or unsupported Facebook video link!*");
     }
 
-    try {
-        // React to show loading
-        await socket.sendMessage(from, { react: { text: "⏳", key: msg.key } });
+    const title = result.title || "Unknown Title";
+    const description = result.desc || "No description available.";
+    const thumbnail = result.thumbnail || "https://i.imgur.com/8pHcK1E.jpeg"; // fallback preview image
+    const sdUrl = result.sd;
+    const hdUrl = result.hd;
 
-        // Fetch FB info
-        const fb = await getFBInfo(args[0]);
-        const url = args[0];
+    const caption = `📘 *ʙʟᴏᴏᴅ 𝙭 ᴍᴅ ᴍɪɴɪ ʙᴏᴛ ꜰᴀᴄᴇʙᴏᴏᴋ ᴅᴏᴡɴʟᴏᴀᴅ* 🎬
 
-        // Short description
-        const shortDesc = fb.desc 
-            ? fb.desc.length > 180 
-                ? fb.desc.substring(0, 180) + '...' 
-                : fb.desc 
-            : 'No description available.';
+*📋 Title ➟* ${title}
+*📝 Description ➟* ${description.substring(0, 120)}...
+*📎 Source ➟* ${fbUrl}
 
-        // Caption with title + description
-        const caption = `╭─────────────────────────────
-│ 🎬 ${fb.title || 'Untitled Video'}
-│─────────────────────────────
-│ 📝 Description:
-│ ${shortDesc}
-│─────────────────────────────
-│ 🌐 URL: ${url}
-│─────────────────────────────
-│ 📥 Select a download option 👇
-╰─────────────────────────────`;
+> 𝘉𝘓𝘖𝘖𝘋-𝘟-𝘔ᴅ-𝘔ɪɴɪ-𝘉ᴏᴛ 💚🔥`;
 
-        // Buttons
-        const buttons = [
-            { buttonId: `.fbsd ${url}`, buttonText: { displayText: '📺 SD Video' }, type: 1 },
-            { buttonId: `.fbhd ${url}`, buttonText: { displayText: '🎥 HD Video' }, type: 1 },
-            { buttonId: `.fbaudio ${url}`, buttonText: { displayText: '🎧 Audio' }, type: 1 },
-            { buttonId: `.fbdoc ${url}`, buttonText: { displayText: '📄 Document (MP4)' }, type: 1 },
-            { buttonId: `.fbptt ${url}`, buttonText: { displayText: '🎤 Voice Note' }, type: 1 }
-        ];
+    const buttons = [
+      sdUrl ? { buttonId: `${config.PREFIX}fbsd ${sdUrl}`, buttonText: { displayText: "🎬 SD Video Download" }, type: 1 } : null,
+      hdUrl ? { buttonId: `${config.PREFIX}fbhd ${hdUrl}`, buttonText: { displayText: "🎥 HD Video Download" }, type: 1 } : null,
+      { buttonId: `${config.PREFIX}fbfile ${fbUrl}`, buttonText: { displayText: "📥 Download as File" }, type: 1 }
+    ].filter(Boolean);
 
-        // Send message with real thumbnail + buttons
-        await socket.sendMessage(from, {
-            image: { url: fb.thumbnail || 'https://files.catbox.moe/b7gyod.jpg' },
-            caption: caption,
-            footer: '🚀 BLOOD XMD MINI BOT | Facebook Downloader',
-            buttons: buttons,
-            headerType: 4,
-            contextInfo: fakeForward
-        }, { quoted: msg });
+    await socket.sendMessage(sender, {
+      image: { url: thumbnail },
+      caption,
+      footer: "🧠 BLOOD XMD MINI BOT ⚡ By Sachithra Madusanka",
+      buttons,
+      headerType: 1,
+      contextInfo: fakeForward
+    }, { quoted: msg });
 
-    } catch (e) {
-        console.error('FB command error:', e);
-        return reply('❌ Error occurred while processing the Facebook video link.');
-    }
-    break;
+  } catch (error) {
+    console.error("Facebook Download Error:", error);
+    reply("⚠️ *දෝෂයක් ඇතිවිය! පසුව නැවත උත්සාහ කරන්න.*");
+  }
+  break;
 }
            case 'system': {
                     const title = "*❗ ꜱʏꜱᴛᴇᴍ ɪɴꜰᴏ ❗*";
