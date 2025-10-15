@@ -1220,10 +1220,48 @@ case 'song': {
 
 > 𝘉𝘓𝘖𝘖𝘋-𝘟-𝘔ᴅ-𝘔ɪɴɪ-𝘉ᴏᴛ 💚🔥`;
 
-    const buttons = [
-      { buttonId: `${config.PREFIX}mp3play ${ytUrl}`, buttonText: { displayText: '🎵 MP3' }, type: 1 },
-      { buttonId: `${config.PREFIX}mp3doc ${ytUrl}`, buttonText: { displayText: '📂 DOCUMENT' }, type: 1 },
-      { buttonId: `${config.PREFIX}mp3ptt ${ytUrl}`, buttonText: { displayText: '🎤 VOICE' }, type: 1 }
+    const templateButtons = [
+        {
+            buttonId: `${config.PREFIX}menu`,
+            buttonText: { displayText: '❲ 𝘔𝘌𝘕𝘜  📄 ❳' },
+            type: 1,
+        },
+        {
+            buttonId: `${config.PREFIX}owner`,
+            buttonText: { displayText: ' ❲ 𝘖𝘞𝘕𝘌𝘙  👑 ❳' },
+            type: 1,
+        },
+        {
+            buttonId: 'action',
+            buttonText: {
+                displayText: ' ◅ ❤️👨‍🔧ᴍᴇɴᴜ ᴏᴘᴄᴛɪᴏɴꜱ ▻'
+            },
+            type: 4,
+            nativeFlowInfo: {
+                name: 'single_select',
+                paramsJson: JSON.stringify({
+                    title: 'TAB-AND-SELECTION ❕',
+                    sections: [
+                        {
+                            title: ` ᴋᴀᴠɪᴅᴜ ᴍᴅ ᴍɪɴɪ ʙᴏᴛ 💣💥`,
+                            highlight_label: '',
+                            rows: [
+                                {
+                                    title: '❲ 𝘔𝘌𝘕𝘜  🔰 ❳',
+                                    description: '',
+                                    id: `${config.PREFIX}menu`,
+                                },
+                                {
+                                    title: '❲ 𝘖𝘞𝘕𝘌𝘙 👑 ❳',
+                                    description: 'ᴋᴀᴠɪᴅᴜ ᴍᴅ ᴍɪɴɪ ʙᴏᴛ 👨‍🔧⚡',
+                                    id: `${config.PREFIX}owner`,
+                                },
+                            ],
+                        },
+                    ],
+                }),
+            },
+        }
     ];
 
     await socket.sendMessage(sender, {
