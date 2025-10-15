@@ -1349,33 +1349,33 @@ case 'facebook': {
     const axios = require("axios");
     const apiKey = "e276311658d835109c";
     const apiUrl = `https://api.nexoracle.com/downloader/facebook?apikey=${apiKey}&url=${encodeURIComponent(fbUrl)}`;
+    const res = await axios.get(apiUrl);
 
-    const response = await axios.get(apiUrl);
-    const result = response.data.result;
+    if (!res.data || !res.data.result)
+      return reply("❌ *Video එක download කරන්න බැරිවුණා. Link එක check කරලා බලන්න!*");
 
-    if (!result || (!result.sd && !result.hd)) {
-      return reply("❌ *Invalid or unsupported Facebook video link!*");
-    }
-
+    const result = res.data.result;
     const title = result.title || "Unknown Title";
-    const description = result.desc || "No description available.";
-    const thumbnail = result.thumbnail || "https://i.imgur.com/8pHcK1E.jpeg"; // fallback preview image
-    const sdUrl = result.sd;
-    const hdUrl = result.hd;
+    const desc = result.desc || "No description.";
+    const thumbnail = result.thumbnail || "https://i.imgur.com/uLh6hQk.jpeg";
+    const sd = result.sd;
+    const hd = result.hd;
 
-    const caption = `📘 *ʙʟᴏᴏᴅ 𝙭 ᴍᴅ ᴍɪɴɪ ʙᴏᴛ ꜰᴀᴄᴇʙᴏᴏᴋ ᴅᴏᴡɴʟᴏᴀᴅ* 🎬
+    const caption = `🎥 *ʙʟᴏᴏᴅ 𝙭 ᴍᴅ ᴍɪɴɪ ʙᴏᴛ ꜰᴀᴄᴇʙᴏᴏᴋ ᴅᴏᴡɴʟᴏᴀᴅ* 🚀
 
-*📋 Title ➟* ${title}
-*📝 Description ➟* ${description.substring(0, 120)}...
-*📎 Source ➟* ${fbUrl}
+*📋 Title:* ${title}
+*📝 Description:* ${desc.slice(0, 100)}...
+*📎 Link:* ${fbUrl}
 
 > 𝘉𝘓𝘖𝘖𝘋-𝘟-𝘔ᴅ-𝘔ɪɴɪ-𝘉ᴏᴛ 💚🔥`;
 
-    const buttons = [
-      sdUrl ? { buttonId: `${config.PREFIX}fbsd ${sdUrl}`, buttonText: { displayText: "🎬 SD Video Download" }, type: 1 } : null,
-      hdUrl ? { buttonId: `${config.PREFIX}fbhd ${hdUrl}`, buttonText: { displayText: "🎥 HD Video Download" }, type: 1 } : null,
-      { buttonId: `${config.PREFIX}fbfile ${fbUrl}`, buttonText: { displayText: "📥 Download as File" }, type: 1 }
-    ].filter(Boolean);
+    // If SD/HD links available, make buttons
+    let buttons = [];
+    if (sd) buttons.push({ buttonId: `${config.PREFIX}fbsd ${sd}`, buttonText: { displayText: "🎬 SD Video" }, type: 1 });
+    if (hd) buttons.push({ buttonId: `${config.PREFIX}fbhd ${hd}`, buttonText: { displayText: "🎥 HD Video" }, type: 1 });
+
+    if (buttons.length === 0)
+      return reply("⚠️ *Facebook video links not found (SD/HD unavailable).*");
 
     await socket.sendMessage(sender, {
       image: { url: thumbnail },
@@ -1386,41 +1386,49 @@ case 'facebook': {
       contextInfo: fakeForward
     }, { quoted: msg });
 
-  } catch (error) {
-    console.error("Facebook Download Error:", error);
-    reply("⚠️ *දෝෂයක් ඇතිවිය! පසුව නැවත උත්සාහ කරන්න.*");
+  } catch (e) {
+    console.error("Facebook Error:", e);
+    reply("⚠️ *දෝෂයක් ඇතිවිය! නැවත උත්සාහ කරන්න.*");
   }
   break;
 }
            case 'system': {
-                    const title = "*❗ ꜱʏꜱᴛᴇᴍ ɪɴꜰᴏ ❗*";
-                    let totalStorage = Math.floor(os.totalmem() / 1024 / 1024) + 'MB';
-                    let freeStorage = Math.floor(os.freemem() / 1024 / 1024) + 'MB';
-                    let cpuModel = os.cpus()[0].model;
-                    let cpuSpeed = os.cpus()[0].speed / 1000;
-                    let cpuCount = os.cpus().length;
-                    let hostname = os.hostname();
+    const title = "*❗ ꜱʏꜱᴛᴇᴍ ɪɴꜰᴏ ❗*";
+    let totalStorage = Math.floor(os.totalmem() / 1024 / 1024) + 'MB';
+    let freeStorage = Math.floor(os.freemem() / 1024 / 1024) + 'MB';
+    let cpuModel = os.cpus()[0].model;
+    let cpuSpeed = os.cpus()[0].speed / 1000;
+    let cpuCount = os.cpus().length;
+    let hostname = os.hostname();
 
-                    let content = `
-  ◦ *Runtime*: ${runtime(process.uptime())}
-  ◦ *Active Bot*: ${activeSockets.size}
-  ◦ *Total Ram*: ${totalStorage}
-  ◦ *CPU Speed*: ${cpuSpeed} GHz
-  ◦ *Number of CPU Cores*: ${cpuCount} 
+    let content = `
+  ◦ *Runtime:* ${runtime(process.uptime())}
+  ◦ *Active Bot:* ${activeSockets.size}
+  ◦ *Total RAM:* ${totalStorage}
+  ◦ *CPU Speed:* ${cpuSpeed} GHz
+  ◦ *CPU Cores:* ${cpuCount}
+  ◦ *Hostname:* ${hostname}
 `;
 
-                    const footer = config.BOT_FOOTER;
+    const footer = config.BOT_FOOTER;
 
-                    await socket.sendMessage(sender, {
-                        image: { url: `https://files.catbox.moe/b7gyod.jpg` },
-                        caption: formatMessage(title, content, footer),
-                      contextInfo: fakeForward,
-}, {
-    quoted: adhimini
+    const buttons = [
+        { buttonId: 'menu', buttonText: { displayText: '➿ ʙᴀᴄᴋ ᴛᴏ ᴍᴀɪɴ ᴍᴇɴᴜ' }, type: 1 },
+        { buttonId: 'ping', buttonText: { displayText: 'ʙʟᴏᴏᴅ xᴍᴅ ᴘɪɴɢ 💥' }, type: 1 }
+    ];
 
-                    });
-                    break;
-                }  
+    const buttonMessage = {
+        image: { url: `https://files.catbox.moe/b7gyod.jpg` },
+        caption: formatMessage(title, content, footer),
+        footer: footer,
+        buttons: buttons,
+        headerType: 4,
+        contextInfo: fakeForward
+    };
+
+    await socket.sendMessage(sender, buttonMessage, { quoted: adhimini });
+    break;
+}  
 
   case 'xnxx': {
     try {
