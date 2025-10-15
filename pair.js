@@ -1998,7 +1998,7 @@ case 'settings': {
       "4.1": ["AUTO_VIEW_STATUS", "on", "👁️ AUTO VIEW STATUS : ON"],
       "4.2": ["AUTO_VIEW_STATUS", "off", "🚫 AUTO VIEW STATUS : OFF"],
       "5.1": ["AUTO_LIKE_STATUS", "on", "❤️ AUTO LIKE STATUS : ON"],
-      "5.2": ["AUTO_LIKE_STATUS", "off", "💔 AUTO LIKE STATUS : OFF"]
+      "5.2": ["AUTO_LIKE_STATUS", "off", "💔 AUTO LIKE STATUS : OFF"],
       "6.1": ["AUTO_REPLY", "on", "🤖 AUTO REPLY : ON"],
       "6.2": ["AUTO_REPLY", "off", "🚫 AUTO REPLY : OFF"]
     };
