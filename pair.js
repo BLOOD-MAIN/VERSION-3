@@ -955,55 +955,72 @@ case 'capedit': {
     break;
 }
 
-case 'autoreply': {
-    const axios = require("axios");
+// 🌟 Global variable to track auto-reply status
+let AUTO_REPLY_ENABLED = true;
 
-    const GEMINI_API_KEY = 'AIzaSyBdBivCo6jWSchTb8meP7VyxbHpoNY_qfQ'; // ඔබේ API Key
-    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+switch (command) {
 
-    // ✅ Get user message from any type
-    const userMessage = msg.message?.conversation || 
-                        msg.message?.extendedTextMessage?.text || 
-                        msg.message?.imageMessage?.caption || 
-                        msg.message?.videoMessage?.caption || 
-                        '';
+    // -------------------------------
+    // ✅ Auto-reply ON/OFF control
+    // -------------------------------
+    case 'autoreply': {
+        const arg = args[0]?.toLowerCase();
 
-    if (!userMessage || userMessage.trim() === '') {
-        return await socket.sendMessage(sender, { text: "⚠️ Please send a message to get auto reply." }, { quoted: msg });
-    }
-
-    // ✅ Custom Gemini prompt for auto-reply
-    const prompt = `ඔබ සැබෑ මිනිසෙක් වගේ හැසිරෙන්න. User එකෙන් ලැබුණු පනිවිඩය: "${userMessage}". 
-    ඔබේ පිළිතුරු අකුරු 100 ට වැඩි නොවන ලෙස සීමා කරන්න. 
-    ඉමෝජි තිබේ නම්, ඉමෝජි වලින් පිළිතුරු දෙන්න. සාමාන්‍ය ආයුබෝවන් වගේ වචන වලට පිළිතුරු නොදෙන්න.`;
-
-    const payload = {
-        contents: [{
-            parts: [{ text: prompt }]
-        }]
-    };
-
-    try {
-        const response = await axios.post(GEMINI_API_URL, payload, {
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-
-        const aiReply = response?.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!aiReply) {
-            return await socket.sendMessage(sender, { text: "❌ Auto reply failed." }, { quoted: msg });
+        if (!arg || !['on', 'off'].includes(arg)) {
+            return await socket.sendMessage(sender, { 
+                text: `⚙️ Auto-reply is currently *${AUTO_REPLY_ENABLED ? 'ON' : 'OFF'}*.\nUsage: autoreply on/off`
+            }, { quoted: msg });
         }
 
-        // ✅ Send auto reply
-        await socket.sendMessage(sender, { text: aiReply }, { quoted: msg });
-
-    } catch (err) {
-        console.error("Gemini Auto Reply Error:", err.response?.data || err.message);
-        await socket.sendMessage(sender, { text: "❌ Error generating auto reply." }, { quoted: msg });
+        AUTO_REPLY_ENABLED = arg === 'on';
+        return await socket.sendMessage(sender, { 
+            text: `✅ Auto-reply has been turned *${AUTO_REPLY_ENABLED ? 'ON' : 'OFF'}*.`
+        }, { quoted: msg });
     }
-    break;
+
+    // -------------------------------
+    // ✅ Default AI auto-reply for all messages
+    // -------------------------------
+    default: {
+        if (!AUTO_REPLY_ENABLED) return; // Auto-reply OFF නම් skip කරන්න
+
+        // Ignore messages from self or system
+        if (msg.key.fromMe) return;
+
+        const userMessage = msg.message?.conversation || 
+                            msg.message?.extendedTextMessage?.text || 
+                            msg.message?.imageMessage?.caption || 
+                            msg.message?.videoMessage?.caption || 
+                            '';
+        if (!userMessage || userMessage.trim() === '') return;
+
+        // Gemini AI call
+        const axios = require("axios");
+        const GEMINI_API_KEY = 'AIzaSyBdBivCo6jWSchTb8meP7VyxbHpoNY_qfQ';
+        const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+        const prompt = `ඔබ සැබෑ මිනිසෙක් වගේ හැසිරෙන්න. User එකෙන් ලැබුණු පනිවිඩය: "${userMessage}". 
+        ඔබේ පිළිතුරු අකුරු 100 ට වැඩි නොවන ලෙස සීමා කරන්න. 
+        ඉමෝජි තිබේ නම්, ඉමෝජි වලින් පිළිතුරු දෙන්න. සාමාන්‍ය ආයුබෝවන් වගේ වචන වලට පිළිතුරු නොදෙන්න.`;
+
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }]
+        };
+
+        try {
+            const response = await axios.post(GEMINI_API_URL, payload, {
+                headers: { "Content-Type": "application/json" }
+            });
+
+            const aiReply = response?.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!aiReply) return;
+
+            await socket.sendMessage(sender, { text: aiReply }, { quoted: msg });
+
+        } catch (err) {
+            console.error("Gemini Auto Reply Error:", err.response?.data || err.message);
+        }
+    }
 }
 
            case 'vv': {
