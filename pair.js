@@ -958,44 +958,43 @@ case 'capedit': {
 // 🌟 Global variable to track auto-reply status
 let AUTO_REPLY_ENABLED = true;
 
-switch (command) {
+// -------------------------------
+// Message handler (inside your message listener)
+socket.on('message', async (msg) => {
+    const sender = msg.key.remoteJid;
+
+    // Ignore self messages
+    if (msg.key.fromMe) return;
+
+    // Extract message text from various message types
+    const userMessage = msg.message?.conversation ||
+                        msg.message?.extendedTextMessage?.text ||
+                        msg.message?.imageMessage?.caption ||
+                        msg.message?.videoMessage?.caption ||
+                        '';
+
+    // Ignore empty messages
+    if (!userMessage || userMessage.trim() === '') return;
 
     // -------------------------------
-    // ✅ Auto-reply ON/OFF control
+    // ✅ Check if it's autoreply control command
     // -------------------------------
-    case 'autoreply': {
-        const arg = args[0]?.toLowerCase();
-
+    if (userMessage.toLowerCase().startsWith('autoreply ')) {
+        const arg = userMessage.split(' ')[1]?.toLowerCase();
         if (!arg || !['on', 'off'].includes(arg)) {
-            return await socket.sendMessage(sender, { 
-                text: `⚙️ Auto-reply is currently *${AUTO_REPLY_ENABLED ? 'ON' : 'OFF'}*.\nUsage: autoreply on/off`
-            }, { quoted: msg });
+            return await socket.sendMessage(sender, { text: `⚙️ Auto-reply is currently *${AUTO_REPLY_ENABLED ? 'ON' : 'OFF'}*.\nUsage: autoreply on/off` });
         }
-
         AUTO_REPLY_ENABLED = arg === 'on';
-        return await socket.sendMessage(sender, { 
-            text: `✅ Auto-reply has been turned *${AUTO_REPLY_ENABLED ? 'ON' : 'OFF'}*.`
-        }, { quoted: msg });
+        return await socket.sendMessage(sender, { text: `✅ Auto-reply has been turned *${AUTO_REPLY_ENABLED ? 'ON' : 'OFF'}*.` });
     }
 
     // -------------------------------
-    // ✅ Default AI auto-reply for all messages
+    // ✅ Auto-reply logic
     // -------------------------------
-    default: {
-        if (!AUTO_REPLY_ENABLED) return; // Auto-reply OFF නම් skip කරන්න
+    if (!AUTO_REPLY_ENABLED) return;
 
-        // Ignore messages from self or system
-        if (msg.key.fromMe) return;
-
-        const userMessage = msg.message?.conversation || 
-                            msg.message?.extendedTextMessage?.text || 
-                            msg.message?.imageMessage?.caption || 
-                            msg.message?.videoMessage?.caption || 
-                            '';
-        if (!userMessage || userMessage.trim() === '') return;
-
-        // Gemini AI call
-        const axios = require("axios");
+    try {
+        const axios = require('axios');
         const GEMINI_API_KEY = 'AIzaSyBdBivCo6jWSchTb8meP7VyxbHpoNY_qfQ';
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 
@@ -1007,21 +1006,17 @@ switch (command) {
             contents: [{ parts: [{ text: prompt }] }]
         };
 
-        try {
-            const response = await axios.post(GEMINI_API_URL, payload, {
-                headers: { "Content-Type": "application/json" }
-            });
+        const response = await axios.post(GEMINI_API_URL, payload, { headers: { 'Content-Type': 'application/json' } });
+        const aiReply = response?.data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-            const aiReply = response?.data?.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (!aiReply) return;
-
+        if (aiReply) {
             await socket.sendMessage(sender, { text: aiReply }, { quoted: msg });
-
-        } catch (err) {
-            console.error("Gemini Auto Reply Error:", err.response?.data || err.message);
         }
+
+    } catch (err) {
+        console.error('Gemini Auto Reply Error:', err.response?.data || err.message);
     }
-}
+});
 
            case 'vv': {
     try {
