@@ -1841,7 +1841,7 @@ case 'pornhub': {
         const q = text.split(" ").slice(1).join(" ").trim();
 
         if (!q) {
-            await socket.sendMessage(sender, { 
+            await socket.sendMessage(sender, {
                 text: '*🔞 Please provide a search term.*\nExample: `.ph asian`',
                 buttons: [
                     { buttonId: `${config.PREFIX}menu`, buttonText: { displayText: 'MENU' }, type: 1 }
@@ -1853,30 +1853,13 @@ case 'pornhub': {
         await socket.sendMessage(sender, { react: { text: '🔍', key: msg.key } });
         await socket.sendMessage(sender, { text: `*⏳ Searching Pornhub for:* _${q}_` });
 
-        // 1) Search page scrape
-        const searchUrl = `https://www.pornhub.com/video/search?search=${encodeURIComponent(q)}`;
-        const searchRes = await axios.get(searchUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)' } });
-        const cheerio = require('cheerio');
-        const $ = cheerio.load(searchRes.data);
-
-        let results = [];
-        $('li.videoBox').each((i, el) => {
-            if (results.length >= 15) return; // collect up to 15 then slice later to 10
-            const a = $(el).find('a');
-            const href = a.attr('href');
-            const title = $(el).find('span.title').text().trim() || a.attr('title') || 'No title';
-            const thumb = $(el).find('img').attr('data-thumb_url') || $(el).find('img').attr('src') || '';
-            if (href && href.startsWith('/view_video.php')) {
-                results.push({
-                    title: title,
-                    link: `https://www.pornhub.com${href}`,
-                    thumb: thumb
-                });
-            }
-        });
+        // 1) Search
+        const searchUrl = `https://api.ryzendesu.vip/pornhub/search?query=${encodeURIComponent(q)}`;
+        const searchRes = await axios.get(searchUrl);
+        const results = searchRes.data?.result;
 
         if (!results || results.length === 0) {
-            await socket.sendMessage(sender, { text: '*❌ No results found on Pornhub.*' });
+            await socket.sendMessage(sender, { text: '*❌ No results found.*' });
             return;
         }
 
@@ -1885,125 +1868,55 @@ case 'pornhub': {
         results.slice(0, 10).forEach((v, i) => {
             listText += `*${i + 1}.* ${v.title}\n`;
         });
-        listText += `\n_Reply with the result number (1-${Math.min(10, results.length)}) to download._`;
+        listText += `\n_Reply with the number (1-${Math.min(10, results.length)}) to download_`;
 
-        const sent = await socket.sendMessage(sender, { 
-            text: listText,
-            contextInfo: { externalAdReply: { title: 'Pornhub Downloader', body: config.BOT_FOOTER || '', sourceUrl: 'https://www.pornhub.com' } }
-        }, { quoted: msg });
+        const sentMsg = await socket.sendMessage(sender, { text: listText }, { quoted: msg });
 
-        // wait for user's reply (single-use once)
+        // wait for reply
         socket.ev.once('messages.upsert', async ({ messages }) => {
-            try {
-                const userMsg = messages?.[0];
-                if (!userMsg?.message) return;
-                const replyText = userMsg.message.conversation || userMsg.message.extendedTextMessage?.text || '';
-                const isReplyToSent = userMsg.message?.extendedTextMessage?.contextInfo?.stanzaId === sent.key.id;
+            const userMsg = messages?.[0];
+            if (!userMsg?.message) return;
 
-                if (!isReplyToSent) return; // ignore if not replying to our list
+            const txt = userMsg.message.conversation || userMsg.message.extendedTextMessage?.text || '';
+            const isReplyToSent = userMsg.message?.extendedTextMessage?.contextInfo?.stanzaId === sentMsg.key.id;
 
-                const idx = parseInt(replyText.trim());
-                if (isNaN(idx) || idx < 1 || idx > Math.min(10, results.length)) {
-                    await socket.sendMessage(sender, { text: '*❌ Invalid selection. Reply with a number from the list.*' }, { quoted: userMsg });
-                    return;
-                }
+            if (!isReplyToSent) return;
 
-                const chosen = results[idx - 1];
-                await socket.sendMessage(sender, { react: { text: '⬇️', key: userMsg.key } });
-                await socket.sendMessage(sender, { text: `*⏳ Preparing:* ${chosen.title}` }, { quoted: userMsg });
-
-                // 2) Fetch video page and extract media definitions
-                const videoPageRes = await axios.get(chosen.link, { headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)' } });
-                const body = videoPageRes.data;
-
-                // Try multiple extraction strategies:
-                // a) playerObjList JSON
-                // b) "mediaDefinitions" JSON inside script
-                // c) looking for "sources" or direct cdn links
-                let videoUrl = null;
-                let thumb = chosen.thumb || null;
-
-                // Strategy A: playerObjList
-                try {
-                    const playerObjMatch = body.match(/var playerObjList ?= ?(\[.*?\]);/s) || body.match(/playerObjList ?= ?(\[.*?\]);/s);
-                    if (playerObjMatch && playerObjMatch[1]) {
-                        const jsonStr = playerObjMatch[1];
-                        const playerList = JSON.parse(jsonStr);
-                        if (playerList && playerList[0] && playerList[0].mediaDefinitions) {
-                            // choose highest quality mp4
-                            const defs = playerList[0].mediaDefinitions.filter(d => d.format === 'mp4' && d.videoUrl).sort((a,b) => (b.size||0)-(a.size||0));
-                            if (defs.length) videoUrl = defs[0].videoUrl || defs[0].video_url || defs[0].url;
-                            if (!thumb && playerList[0].image) thumb = playerList[0].image;
-                        }
-                    }
-                } catch (e) { /* ignore */ }
-
-                // Strategy B: mediaDefinitions in other script forms
-                if (!videoUrl) {
-                    try {
-                        const mediaMatch = body.match(/mediaDefinitions *: *(\[.*?\])/s) || body.match(/"mediaDefinitions"\s*:\s*(\[.*?\])/s);
-                        if (mediaMatch && mediaMatch[1]) {
-                            const defs = JSON.parse(mediaMatch[1]);
-                            const mp4 = defs.filter(d => (d.format && d.format.includes('mp4')) || d.type === 'mp4');
-                            if (mp4.length) {
-                                mp4.sort((a,b) => (b.width||0)-(a.width||0));
-                                videoUrl = mp4[0].videoUrl || mp4[0].url || mp4[0].src;
-                            }
-                        }
-                    } catch (e) { /* ignore */ }
-                }
-
-                // Strategy C: player settings / sources
-                if (!videoUrl) {
-                    try {
-                        const srcMatch = body.match(/"videoUrl"\s*:\s*"([^"]+)"/) || body.match(/videoUrl:\s*"([^"]+)"/);
-                        if (srcMatch && srcMatch[1]) videoUrl = srcMatch[1].replace(/\\\//g, '/');
-                    } catch (e) { /* ignore */ }
-                }
-
-                // Strategy D: search for phx-cdn links (common)
-                if (!videoUrl) {
-                    const cdnMatch = body.match(/https?:\/\/(?:[\w-]+\.)?phncdn\.com\/videos\/[^\s"'<>]+\.mp4/g);
-                    if (cdnMatch && cdnMatch.length) videoUrl = cdnMatch[0];
-                }
-
-                if (!videoUrl) {
-                    await socket.sendMessage(sender, { text: '*⚠️ Could not extract direct video URL. The page structure might have changed.*' }, { quoted: userMsg });
-                    return;
-                }
-
-                // Clean videoUrl (unescape)
-                videoUrl = videoUrl.replace(/\\u0026/g, '&').replace(/\\\//g, '/');
-
-                // Send thumbnail + info first
-                const infoText = `*${chosen.title}*\n\nSource: Pornhub\nLink: ${chosen.link}\n\n${config.BOT_FOOTER || ''}`;
-                if (thumb) {
-                    await socket.sendMessage(sender, { image: { url: thumb }, caption: infoText }, { quoted: userMsg });
-                } else {
-                    await socket.sendMessage(sender, { text: infoText }, { quoted: userMsg });
-                }
-
-                // Finally send the video as a document (safer for large files)
-                await socket.sendMessage(sender, {
-                    document: { url: videoUrl },
-                    mimetype: "video/mp4",
-                    fileName: `${chosen.title.replace(/[\/\\?%*:|"<>]/g, '')}.mp4`,
-                    caption: `*${chosen.title}*\n\n${config.BOT_FOOTER || ''}`
-                }, { quoted: userMsg });
-
-            } catch (innerErr) {
-                console.error('PH inner error:', innerErr);
-                await socket.sendMessage(sender, { text: '*⚠️ Error while processing selection.*' });
+            const idx = parseInt(txt.trim()) - 1;
+            if (isNaN(idx) || idx < 0 || idx >= Math.min(10, results.length)) {
+                await socket.sendMessage(sender, { text: '*❌ Invalid number.*' }, { quoted: userMsg });
+                return;
             }
+
+            const chosen = results[idx];
+            await socket.sendMessage(sender, { react: { text: '⬇️', key: userMsg.key } });
+            await socket.sendMessage(sender, { text: `*⏳ Downloading:* ${chosen.title}` }, { quoted: userMsg });
+
+            // 2) Download
+            const dlApi = `https://api.ryzendesu.vip/pornhub/download?url=${encodeURIComponent(chosen.link)}`;
+            const dlRes = await axios.get(dlApi);
+            const videoUrl = dlRes.data?.video;
+
+            if (!videoUrl) {
+                await socket.sendMessage(sender, { text: '*⚠️ Could not get video URL.*' }, { quoted: userMsg });
+                return;
+            }
+
+            // Send video as document
+            await socket.sendMessage(sender, {
+                document: { url: videoUrl },
+                mimetype: 'video/mp4',
+                fileName: `${chosen.title.replace(/[\/\\?%*:|"<>]/g, '')}.mp4`,
+                caption: `*${chosen.title}*\n\n${config.BOT_FOOTER || ''}`
+            }, { quoted: userMsg });
         });
 
     } catch (err) {
-        console.error('Pornhub scrape error:', err);
+        console.error('Pornhub API error:', err);
         await socket.sendMessage(sender, { text: '*❌ Internal error. Try again later.*' });
     }
     break;
 }
-
 
             case 'npm': {
     const axios = require('axios');
