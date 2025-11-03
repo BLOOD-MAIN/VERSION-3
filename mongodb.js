@@ -1,7 +1,7 @@
 // mongodb.js
 const { MongoClient } = require('mongodb');
 
-const uri = 'mongodb+srv://sachi:252825@cluster0.khy628s.mongodb.net/';
+const uri = 'mongodb+srv://version:234234@cluster0.zelpxpg.mongodb.net/';
 const client = new MongoClient(uri, { maxPoolSize: 10 });
 
 const defaults = {
