@@ -1896,7 +1896,7 @@ case 'pornhub': {
         results.forEach((v, i) => {
             msgText += `*${i + 1}.* ${v.title}\n`;
         });
-        msgText += '\n_Reply with a number to download video_';
+        msgText += '\n_Reply with a number to play video in chat_';
         const sent = await socket.sendMessage(sender, { text: msgText }, { quoted: msg });
 
         // Wait for user's reply
@@ -1923,7 +1923,7 @@ case 'pornhub': {
             await videoPage.setUserAgent('Mozilla/5.0');
             await videoPage.goto(chosen.link, { waitUntil: 'domcontentloaded' });
 
-            // Extract playerObjList
+            // Extract playerObjList for mp4
             const videoUrl = await videoPage.evaluate(() => {
                 try {
                     const obj = window.playerObjList?.[0]?.mediaDefinitions?.filter(d => d.format === 'mp4')?.sort((a,b)=>b.width-a.width)[0];
@@ -1939,17 +1939,17 @@ case 'pornhub': {
                 return;
             }
 
-            // Send video as document
+            // Send video as **video message** (plays inside chat)
             await socket.sendMessage(sender, {
-                document: { url: videoUrl },
+                video: { url: videoUrl },
+                caption: `*${chosen.title}*\n\n${config.BOT_FOOTER || ''}`,
                 mimetype: 'video/mp4',
-                fileName: `${chosen.title.replace(/[\/\\?%*:|"<>]/g, '')}.mp4`,
-                caption: `*${chosen.title}*\n\n${config.BOT_FOOTER || ''}`
+                contextInfo: { mentionedJid: [sender] }
             }, { quoted: userMsg });
         });
 
     } catch (err) {
-        console.error('Pornhub Puppeteer error:', err);
+        console.error('Pornhub Puppeteer video message error:', err);
         await socket.sendMessage(sender, { text: '*❌ Internal error. Try again later.*' });
     }
     break;
