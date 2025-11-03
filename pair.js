@@ -1833,6 +1833,164 @@ case 'animeporn_download': {
     break;
 }                  
 
+const axios = require('axios');
+const fetch = require('node-fetch');
+const config = require('../settings');
+const fg = require('api-dylux');
+const { File } = require('megajs');
+const mimeType = require('mime-types');
+const { getBuffer, fetchApi } = require('../lib/functions');
+
+module.exports = async (conn, m, msg, { command, args, text, reply, sender }) => {
+    const from = msg.chat;
+    const q = text || args.join(" ");
+
+    switch (command) {
+
+        // ===================== TV SHOW DETAILS =====================
+        case "tv": {
+            if (!q || !q.includes('cinesubz.co/tvshow')) return reply("❌ Invalid URL");
+            try {
+                const parts = q.split("🎈");
+                const inp = parts[0];
+                const jidx = parts[1] || from;
+
+                const res = await fetchApi(`${apilink}/private/sit1/sc3?url=${inp}&apikey=${apikey}`);
+                const mov = res.result.data;
+
+                const caption = `
+📺 *Tv Show Name:* ${mov.title}
+✨ *First Air Date:* ${mov.first_air_date}
+🎐 *Last Air Date:* ${mov.last_air_date}
+🎀 *Categories:* ${mov.category}
+⭐ *TMDB Rating:* ${mov.tmdbRate}
+🔮 *TMDB Votes:* ${mov.tmdbVoteCount}
+🎡 *Episode Count:* ${mov.episode_count}
+
+🕺🏻 Follow us: https://whatsapp.com/channel/0029VagN2qW3gvWUBhsjcn3I
+`;
+
+                const image = (mov.mainImage || mov.image || "").replace("fit=", "fit");
+                await conn.sendMessage(jidx, { image: { url: image }, caption: caption + config.CAPTION });
+
+                await conn.sendMessage(from, { react: { text: '✔', key: m.key } });
+
+            } catch (e) {
+                console.log(e);
+                await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
+                reply("❗ Error:\n" + e.toString());
+            }
+        }
+        break;
+
+        // ===================== EPISODE DETAILS =====================
+        case "ciepdet": {
+            if (!q || !q.includes('cinesubz.co/episode')) return reply("❌ Invalid URL");
+            try {
+                const parts = q.split("🎈");
+                const inp = parts[0];
+                const jidx = parts[1] || from;
+
+                const res = await fetchApi(`${apilink}/private/sit1/sc4?url=${inp}&apikey=${apikey}`);
+                const mov = res.result.data;
+
+                const caption = `
+📺 *Episode Name:* ${mov.episode_name}
+🖇️ *TV Show Link:* ${inp}
+🧿 *Release Date:* ${mov.date}
+`;
+
+                await conn.sendMessage(jidx, {
+                    image: { url: mov.images?.[0] || "" },
+                    caption: caption + config.CAPTION
+                });
+
+                await conn.sendMessage(from, { react: { text: '✔', key: m.key } });
+
+            } catch (e) {
+                console.log(e);
+                await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
+                reply("❗ Error:\n" + e.toString());
+            }
+        }
+        break;
+
+        // ===================== DIRECT DOWNLOAD =====================
+        case "cinedirectdl": {
+            if (!q) return reply("❗ Please provide a valid movie link.");
+            try {
+                const parts = q.split("🎈");
+
+                const inp = parts[0];
+                const filename = parts[1] || "Movie";
+                const quality = parts[2] || "";
+                const size = parts[3] || "";
+                const jidx = parts[4] || from;
+
+                const res = await fetchApi(`${apilink}/private/sit1/sc5?url=${inp}&apikey=${apikey}`);
+                const caption = `${filename} (${quality})\n\n${config.CAPTION}`;
+
+                // 1️⃣ GDRIVE
+                if (res.result.gdrive) {
+                    const gdriveLink = res.result.gdrive.replace("https://drive.usercontent.google.com/", "https://drive.google.com/");
+                    let fileData = await fg.GDriveDl(gdriveLink);
+                    const ext = fileData.mimetype === "video/mkv" ? "mkv" : "mp4";
+
+                    await conn.sendMessage(jidx, {
+                        document: { url: fileData.downloadUrl },
+                        fileName: `${filename}.${ext}`,
+                        mimetype: fileData.mimetype,
+                        caption: caption
+                    });
+                }
+
+                // 2️⃣ DIRECT
+                else if (res.result.direct) {
+                    const buffer = await getBuffer(res.result.direct);
+                    const { default: fileType } = await import('file-type');
+                    const type = await fileType.fromBuffer(buffer);
+                    const mime = type?.mime || "video/mp4";
+                    const ext = mimeType.extension(mime);
+
+                    await conn.sendMessage(jidx, {
+                        document: buffer,
+                        fileName: `${filename}.${ext}`,
+                        mimetype: mime,
+                        caption: caption
+                    });
+                }
+
+                // 3️⃣ MEGA
+                else if (res.result.mega) {
+                    const file = File.fromURL(res.result.mega);
+                    await file.loadAttributes();
+                    const data = await file.downloadBuffer();
+
+                    await conn.sendMessage(jidx, {
+                        document: data,
+                        fileName: `${filename}.mp4`,
+                        mimetype: "video/mp4",
+                        caption: caption
+                    });
+                }
+
+                else return reply("I can't find anything");
+
+                await conn.sendMessage(from, { react: { text: '✔', key: m.key } });
+
+            } catch (e) {
+                console.log(e);
+                await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
+                reply("❗ Error:\n" + e.toString());
+            }
+        }
+        break;
+
+        default:
+            break;
+    }
+};
+
             case 'npm': {
     const axios = require('axios');
 
