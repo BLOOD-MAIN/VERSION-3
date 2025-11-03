@@ -1349,7 +1349,7 @@ case 'mp3ptt': {
     const ytUrl = args[0];
     if (!ytUrl) return reply("❌ *YouTube link එකක් ලබා දෙන්න!*");
 
-    const apiUrl = `https://sadiya-tech-apis.vercel.app/download/ytdl?url=${ytUrl}&format=mp3&apikey=sadiya`;
+    const apiUrl = `https://api.davidcyriltech.my.id/download/ytmp3?url=${encodeURIComponent(videoUrl`;
     const { data: apiRes } = await axios.get(apiUrl);
 
     if (!apiRes?.status || !apiRes.result?.download)
