@@ -64,7 +64,7 @@ const {
     downloadContentFromMessage,
     prepareWAMessageMedia,
     generateWAMessageFromContent
-} = require('@whiskeysockets/baileys');
+} = require('@dark-yasiya/baileys');
 //=======================================
 const config = {
     AUTO_LIKE_STATUS: 'true',
