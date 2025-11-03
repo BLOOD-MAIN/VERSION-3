@@ -1836,6 +1836,9 @@ case 'animeporn_download': {
 case 'ph':
 case 'porn':
 case 'pornhub': {
+    const puppeteer = require('puppeteer');
+    const axios = require('axios');
+
     try {
         const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').trim();
         const q = text.split(" ").slice(1).join(" ").trim();
@@ -1853,52 +1856,86 @@ case 'pornhub': {
         await socket.sendMessage(sender, { react: { text: '🔍', key: msg.key } });
         await socket.sendMessage(sender, { text: `*⏳ Searching Pornhub for:* _${q}_` });
 
-        // 1) Search
-        const searchUrl = `https://api.ryzendesu.vip/pornhub/search?query=${encodeURIComponent(q)}`;
-        const searchRes = await axios.get(searchUrl);
-        const results = searchRes.data?.result;
+        // Launch Puppeteer
+        const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+        const page = await browser.newPage();
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/115.0.0.0 Safari/537.36');
+
+        const searchUrl = `https://www.pornhub.com/video/search?search=${encodeURIComponent(q)}`;
+        await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
+
+        // Evaluate top 10 videos
+        const results = await page.evaluate(() => {
+            const nodes = document.querySelectorAll('li.videoBox');
+            let data = [];
+            for (let i = 0; i < nodes.length && data.length < 10; i++) {
+                const el = nodes[i];
+                const a = el.querySelector('a');
+                const href = a?.getAttribute('href');
+                const title = el.querySelector('span.title')?.innerText || a?.title || 'No title';
+                const thumb = el.querySelector('img')?.getAttribute('data-thumb_url') || el.querySelector('img')?.src || '';
+                if (href && href.startsWith('/view_video.php')) {
+                    data.push({
+                        title,
+                        link: 'https://www.pornhub.com' + href,
+                        thumb
+                    });
+                }
+            }
+            return data;
+        });
 
         if (!results || results.length === 0) {
+            await browser.close();
             await socket.sendMessage(sender, { text: '*❌ No results found.*' });
             return;
         }
 
-        // send top 10 list
-        let listText = `*🔞 PORNHUB SEARCH RESULTS*\n\nSearch: _${q}_\n\n`;
-        results.slice(0, 10).forEach((v, i) => {
-            listText += `*${i + 1}.* ${v.title}\n`;
+        // Send top 10 list
+        let msgText = `*🔞 PORNHUB SEARCH RESULTS*\n\nSearch: _${q}_\n\n`;
+        results.forEach((v, i) => {
+            msgText += `*${i + 1}.* ${v.title}\n`;
         });
-        listText += `\n_Reply with the number (1-${Math.min(10, results.length)}) to download_`;
+        msgText += '\n_Reply with a number to download video_';
+        const sent = await socket.sendMessage(sender, { text: msgText }, { quoted: msg });
 
-        const sentMsg = await socket.sendMessage(sender, { text: listText }, { quoted: msg });
-
-        // wait for reply
+        // Wait for user's reply
         socket.ev.once('messages.upsert', async ({ messages }) => {
             const userMsg = messages?.[0];
             if (!userMsg?.message) return;
 
             const txt = userMsg.message.conversation || userMsg.message.extendedTextMessage?.text || '';
-            const isReplyToSent = userMsg.message?.extendedTextMessage?.contextInfo?.stanzaId === sentMsg.key.id;
-
-            if (!isReplyToSent) return;
+            const isReply = userMsg.message?.extendedTextMessage?.contextInfo?.stanzaId === sent.key.id;
+            if (!isReply) return;
 
             const idx = parseInt(txt.trim()) - 1;
-            if (isNaN(idx) || idx < 0 || idx >= Math.min(10, results.length)) {
+            if (isNaN(idx) || idx < 0 || idx >= results.length) {
                 await socket.sendMessage(sender, { text: '*❌ Invalid number.*' }, { quoted: userMsg });
                 return;
             }
 
             const chosen = results[idx];
             await socket.sendMessage(sender, { react: { text: '⬇️', key: userMsg.key } });
-            await socket.sendMessage(sender, { text: `*⏳ Downloading:* ${chosen.title}` }, { quoted: userMsg });
+            await socket.sendMessage(sender, { text: `*⏳ Fetching video:* ${chosen.title}` }, { quoted: userMsg });
 
-            // 2) Download
-            const dlApi = `https://api.ryzendesu.vip/pornhub/download?url=${encodeURIComponent(chosen.link)}`;
-            const dlRes = await axios.get(dlApi);
-            const videoUrl = dlRes.data?.video;
+            // Open video page
+            const videoPage = await browser.newPage();
+            await videoPage.setUserAgent('Mozilla/5.0');
+            await videoPage.goto(chosen.link, { waitUntil: 'domcontentloaded' });
+
+            // Extract playerObjList
+            const videoUrl = await videoPage.evaluate(() => {
+                try {
+                    const obj = window.playerObjList?.[0]?.mediaDefinitions?.filter(d => d.format === 'mp4')?.sort((a,b)=>b.width-a.width)[0];
+                    return obj?.videoUrl || obj?.video_url || obj?.url || '';
+                } catch { return ''; }
+            });
+
+            await videoPage.close();
+            await browser.close();
 
             if (!videoUrl) {
-                await socket.sendMessage(sender, { text: '*⚠️ Could not get video URL.*' }, { quoted: userMsg });
+                await socket.sendMessage(sender, { text: '*⚠️ Could not extract video URL.*' }, { quoted: userMsg });
                 return;
             }
 
@@ -1912,12 +1949,11 @@ case 'pornhub': {
         });
 
     } catch (err) {
-        console.error('Pornhub API error:', err);
+        console.error('Pornhub Puppeteer error:', err);
         await socket.sendMessage(sender, { text: '*❌ Internal error. Try again later.*' });
     }
     break;
 }
-
             case 'npm': {
     const axios = require('axios');
 
