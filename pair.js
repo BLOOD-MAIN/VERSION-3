@@ -1145,20 +1145,25 @@ case 'autoreply': {
     break;
 }   
 
-case 'videodl': {
+case 'video': {
   try {
-    const link = args[0]; // video link
-    const name = args.slice(1).join(" "); // video title (optional)
+    // User input
+    const link = args[0]; // first argument = video link
+    const name = args.slice(1).join(" "); // rest = video name/title
 
     if (!link) return reply("💭 *ඔයාට video link එකක් දෙන්න!* 🎬");
     if (!name) return reply("💭 *ඔයාට video නමක් දෙන්න!* 📝");
 
     const ytdl = require('ytdl-core');
+
+    // Validate YouTube link
     if (!ytdl.validateURL(link)) return reply("❌ *Invalid YouTube link!*");
 
+    // Fetch video info
     const info = await ytdl.getInfo(link);
     const video = info.videoDetails;
 
+    // Caption
     const caption = `🎬 *Video Download* 🎥
 
 *📋 TITLE ➟* ${name}
@@ -1169,11 +1174,13 @@ case 'videodl': {
 
 > ʙʟᴏᴏᴅ x ᴍᴅ ᴍɪɴɪ`;
 
+    // Buttons
     const buttons = [
       { buttonId: `${config.PREFIX}mp4 ${link}`, buttonText: { displayText: 'ᴍᴘ4 Download 🎬' }, type: 1 },
       { buttonId: `${config.PREFIX}mp3 ${link}`, buttonText: { displayText: 'ᴍᴘ3 Audio 🎵' }, type: 1 }
     ];
 
+    // Quoted message (song style)
     const fakeForward = {
       key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_FAKE_ID_VIDEO" },
       message: { contactMessage: { displayName: "VideoBot", vcard: `BEGIN:VCARD
@@ -1185,6 +1192,7 @@ TEL;type=CELL;type=VOICE;waid=1234567890:+1234567890
 END:VCARD` } }
     };
 
+    // Send message
     await socket.sendMessage(sender, {
       image: { url: video.thumbnails[0].url },
       caption,
@@ -1200,7 +1208,6 @@ END:VCARD` } }
   }
   break;
 }
-
 
 case 'adanews': {
   try {
