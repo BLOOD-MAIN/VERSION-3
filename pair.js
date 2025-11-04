@@ -958,24 +958,21 @@ case 'capedit': {
     break;
 }
 
-case 'pronhub': {
+case 'ph': {
   try {
     const q = args.join(" ");
     if (!q) return reply("💭 *ඔයාට සොයන්න query එකක් දෙන්න!* 🍑");
 
     const axios = require('axios');
     const cheerio = require('cheerio');
+    const stream = require('stream');
+    const ffmpeg = require('fluent-ffmpeg');
 
     // Pornhub search URL
     const searchUrl = `https://www.pornhub.com/video/search?search=${encodeURIComponent(q)}`;
-
-    const { data: html } = await axios.get(searchUrl, {
-      headers: { 'User-Agent': 'Mozilla/5.0' }
-    });
+    const { data: html } = await axios.get(searchUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
 
     const $ = cheerio.load(html);
-
-    // Find first video
     const firstVideo = $('li.videoBox').first();
     if (!firstVideo.length) return reply("❌ *Video එක හමු නොවුණා!*");
 
@@ -994,7 +991,6 @@ case 'pronhub': {
 
 > 𝗕𝗟𝗢𝗢𝗗-𝘅-𝗠𝗗-𝗠𝗜𝗡𝗜 🔥`;
 
-    // Buttons: React-style
     const buttons = [
       { buttonId: `pronhub_play ${url}`, buttonText: { displayText: '🎬 ᴘʟᴀʏ' }, type: 1 },
       { buttonId: `pronhub_doc ${url}`, buttonText: { displayText: '📂 ᴅᴏᴄᴜᴍᴇɴᴛ' }, type: 1 },
@@ -1016,7 +1012,6 @@ case 'pronhub': {
   }
   break;
 }
-
 
 case 'autoreply': {
   try {
