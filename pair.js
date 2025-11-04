@@ -958,7 +958,7 @@ case 'capedit': {
     break;
 }
 
-case 'xvideo':
+case 'xx':
 case 'xvideo2': {
   try {
     const query = args.join(" ");
@@ -978,21 +978,21 @@ case 'xvideo2': {
       isURL = true;
     } else {
       await socket.sendMessage(sender, { react: { text: '🔍', key: msg.key } }, { quoted: botMention });
-      const searchRes = await axios.get(`https://saviya-kolla-api.koyeb.app/search/xvideos?query=${encodeURIComponent(query)}`);
-      if (!searchRes.data?.status || !searchRes.data.result?.length) {
-        return await socket.sendMessage(sender, { text: '*❌ No results found for your query.*' }, { quoted: botMention });
+      const searchRes = await axios.get(`https://saviya-kolla-api.koyeb.app/search/xvideos?query=${encodeURIComponent(query)}`).catch(() => null);
+      if (!searchRes?.data?.status || !searchRes.data.result?.length) {
+        return await socket.sendMessage(sender, { text: '*❌ No results found or API unavailable.*' }, { quoted: botMention });
       }
       videoData = searchRes.data.result[0];
     }
 
-    const dlRes = await axios.get(`https://saviya-kolla-api.koyeb.app/download/xvideos?url=${encodeURIComponent(videoData.url)}`);
-    if (!dlRes.data?.status || !dlRes.data.result?.url) {
-      return await socket.sendMessage(sender, { text: '*❌ Failed to fetch video. API may be down.*' }, { quoted: botMention });
+    const dlRes = await axios.get(`https://saviya-kolla-api.koyeb.app/download/xvideos?url=${encodeURIComponent(videoData.url)}`).catch(() => null);
+    if (!dlRes?.data?.status || !dlRes.data.result?.url) {
+      return await socket.sendMessage(sender, { text: '*❌ Unable to fetch video. API may be down.*' }, { quoted: botMention });
     }
 
     const dl = dlRes.data.result;
 
-    const caption = `📹 *${dl.title || videoData.title}*\n\n⏱️ ${isURL ? '' : `Duration: ${videoData.duration || 'N/A'}`}\n👁️ Views: ${dl.views || 'N/A'}\n👍 Likes: ${dl.likes || 'N/A'} | 👎 Dislikes: ${dl.dislikes || 'N/A'}\n\n_Provided by ${botName}_`;
+    const caption = `📹 *${dl.title || videoData.title}*\n⏱️ ${isURL ? '' : `Duration: ${videoData.duration || 'N/A'}`}\n👁️ Views: ${dl.views || 'N/A'}\n👍 Likes: ${dl.likes || 'N/A'} | 👎 Dislikes: ${dl.dislikes || 'N/A'}\n\n_Provided by ${botName}_`;
 
     const buttons = [
       { buttonId: `${config.PREFIX}xvdl ${videoData.url}`, buttonText: { displayText: '🎬 Download Video' }, type: 1 },
