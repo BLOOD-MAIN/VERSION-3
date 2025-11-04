@@ -1143,7 +1143,132 @@ case 'autoreply': {
         reply("An error occurred while fetching the ViewOnce message.");
     }
     break;
-}   
+} 
+
+// ====================== AUTO AI SYSTEM ====================== //
+
+// ---------- 1️⃣ .autoai COMMAND (toggle, mode, prompt, logging) ----------
+case 'autoai': {
+  try {
+    if (!(isCreator || isOwner || isAdmins)) 
+      return reply("❌ Owner/Admin පමණක් භාවිත කළ හැක!");
+
+    const opt = (args[0] || '').toLowerCase();
+    if(!opt) return reply("🔧 Usage:\n.autoai on/off/status\n.autoai mode <all|onlytext|exceptadmin>\n.autoai setprompt <text>\n.autoai log on/off");
+
+    if(opt === 'status'){
+      const mode = await getSetting('AUTO_AI_MODE') || 'off';
+      const listenMode = await getSetting('AUTO_AI_LISTEN_MODE') || 'all';
+      const prompt = await getSetting('AUTO_AI_PROMPT') || 'You are a helpful AI assistant.';
+      const log = await getSetting('AUTO_AI_LOG') || 'off';
+      return reply(`🤖 Auto AI Status: *${mode}*\nMode type: *${listenMode}*\nPrompt: ${prompt}\nLogging: ${log}`);
+    }
+
+    if(['on','off'].includes(opt)){
+      await updateSetting('AUTO_AI_MODE', opt);
+      return reply(`✅ Auto AI ${opt === 'on' ? 'activated (all chats)' : 'deactivated'}.`);
+    }
+
+    if(opt === 'log'){
+      const val = (args[1] || '').toLowerCase();
+      if(!['on','off'].includes(val)) return reply("Usage: .autoai log on/off");
+      await updateSetting('AUTO_AI_LOG', val);
+      return reply(`📝 Auto AI logging ${val}`);
+    }
+
+    if(opt === 'mode'){
+      const val = (args[1] || '').toLowerCase();
+      if(!['all','onlytext','exceptadmin'].includes(val)) return reply("Usage: .autoai mode <all|onlytext|exceptadmin>");
+      await updateSetting('AUTO_AI_LISTEN_MODE', val);
+      return reply(`🎛️ Auto AI listening mode set to *${val}*`);
+    }
+
+    if(opt === 'setprompt'){
+      const textPrompt = args.slice(1).join(' ');
+      if(!textPrompt) return reply("Provide prompt text. Example: .autoai setprompt Hello, you are friendly AI");
+      await updateSetting('AUTO_AI_PROMPT', textPrompt);
+      return reply(`✏️ AI Prompt saved:\n${textPrompt}`);
+    }
+
+  } catch(e){
+    console.error('AUTOAI COMMAND ERROR', e);
+    return reply("⚠️ Error occurred. Try again later.");
+  }
+}
+break;
+
+// ---------- 2️⃣ AUTO AI LISTENER (all chats) ----------
+(async()=>{
+  try{
+    const autoAiMode = (await getSetting('AUTO_AI_MODE')) || 'off';
+    if(autoAiMode !== 'on') return;
+
+    const listenMode = (await getSetting('AUTO_AI_LISTEN_MODE')) || 'all';
+    const logAI = (await getSetting('AUTO_AI_LOG')) || 'off';
+    const prompt = (await getSetting('AUTO_AI_PROMPT')) || 'You are a helpful AI assistant.';
+
+    const text = (body || msg?.message?.conversation || msg?.message?.extendedTextMessage?.text || '').toString().trim();
+    if(!text) return;              // ignore empty
+    if(msg.key?.fromMe) return;     // ignore bot own messages
+    if(/^[.!/]/.test(text)) return; // ignore commands
+
+    if(listenMode==='onlytext' && !text) return;
+    if(listenMode==='exceptadmin' && isAdmins) return;
+
+    // Cooldown per chat
+    if(!global.__autoAiCooldown) global.__autoAiCooldown = new Map();
+    const last = global.__autoAiCooldown.get(sender) || 0;
+    const COOLDOWN = 5000;
+    if(Date.now() - last < COOLDOWN) return;
+    global.__autoAiCooldown.set(sender, Date.now());
+
+    // Typing simulation
+    try { await socket.sendPresenceUpdate('composing', sender); } catch{}
+
+    // Get AI reply from Gemini
+    const aiReply = await callGeminiAI(prompt, text);
+
+    // small typing delay proportional to reply length
+    await new Promise(r=>setTimeout(r, Math.min(1200 + aiReply.length*8,4500)));
+
+    // send reply with branding
+    await socket.sendMessage(sender,{
+      text: aiReply,
+      contextInfo: fakeForward
+    }, { quoted: adhimini });
+
+    try { await socket.sendPresenceUpdate('paused', sender); } catch{}
+
+    // Logging
+    if(logAI==='on') console.log(`[AUTO_AI LOG] Chat: ${sender}, Msg: ${text}, Reply: ${aiReply}`);
+
+  } catch(e){
+    console.error('AUTO AI LISTENER ERROR', e);
+  }
+})();
+
+// ---------- 3️⃣ Gemini AI Helper Function ----------
+async function callGeminiAI(prompt, userText){
+  try{
+    const apiKey = process.env.GEMINI_API_KEY || 'YOUR_KEY_HERE';
+    const res = await axios.post('https://gemini.api.fake/ai/reply',{
+      prompt: `${prompt}\nUser: ${userText}\nAI:`
+    },{
+      headers: { Authorization: `Bearer ${apiKey}` },
+      timeout: 25000
+    });
+
+    if(res?.data?.reply){
+      let out = res.data.reply.toString();
+      if(out.length>3000) out = out.slice(0,2997)+'...';
+      return `🤖 META AI RESPONSE:\n\n${out}\n\n> ʙʟᴏᴏᴅ xᴍᴅ ᴍɪɴɪ ᴀɪ`;
+    }
+    return "⚠️ AI response unavailable!";
+  } catch(e){
+    console.error('Gemini AI ERROR', e.message || e);
+    return "⚠️ AI service error, try again later.";
+  }
+}  
 
 case 'video': {
   try {
