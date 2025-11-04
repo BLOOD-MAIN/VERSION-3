@@ -958,6 +958,64 @@ case 'capedit': {
     break;
 }
 
+case 'xvideo':
+case 'xvideo2': {
+  try {
+    const query = args.join(" ");
+    if (!query) return reply('*❌ Usage: .xvideo <url/query>*');
+
+    // ---------------------------
+    const sanitized = (number || '').replace(/[^0-9]/g, '');
+    const userCfg = await loadUserConfigFromMongo(sanitized) || {};
+    const botName = userCfg.botName || BOT_NAME_FANCY;
+
+    const botMention = {
+      key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: `META_AI_FAKE_ID_${command.toUpperCase()}` },
+      message: { contactMessage: { displayName: botName, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${botName};;;;\nFN:${botName}\nORG:Meta Platforms\nTEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002\nEND:VCARD` } }
+    };
+    // ---------------------------
+
+    let video = null;
+    let isURL = false;
+
+    if (query.startsWith('http')) {
+      video = query;
+      isURL = true;
+    } else {
+      await socket.sendMessage(sender, { react: { text: '🔍', key: msg.key } }, { quoted: botMention });
+      const searchRes = await axios.get(`https://saviya-kolla-api.koyeb.app/search/xvideos?query=${encodeURIComponent(query)}`);
+      if (!searchRes.data?.status || !searchRes.data.result?.length) throw new Error('No results found');
+      video = searchRes.data.result[0];
+    }
+
+    const downloadRes = await axios.get(`https://saviya-kolla-api.koyeb.app/download/xvideos?url=${encodeURIComponent(isURL ? video : video.url)}`);
+    if (!downloadRes.data?.status) throw new Error('Download API failed');
+
+    const dl = downloadRes.data.result;
+
+    const caption = `📹 *${dl.title}*\n\n⏱️ ${isURL ? '' : `Duration: ${video.duration}`}\n👁️ Views: ${dl.views}\n👍 Likes: ${dl.likes} | 👎 Dislikes: ${dl.dislikes}\n\n_Provided by ${botName}_`;
+
+    const buttons = [
+      { buttonId: `${config.PREFIX}xvdl ${isURL ? video : video.url}`, buttonText: { displayText: '🎬 Download Video' }, type: 1 },
+      { buttonId: `${config.PREFIX}xvaudio ${isURL ? video : video.url}`, buttonText: { displayText: '🎵 Download Audio' }, type: 1 }
+    ];
+
+    await socket.sendMessage(sender, {
+      video: { url: dl.url },
+      caption,
+      footer: `🧠 ${botName} ⚡`,
+      buttons,
+      headerType: 1,
+      contextInfo: fakeForward
+    }, { quoted: botMention });
+
+  } catch (err) {
+    console.error('xvideo error:', err);
+    await socket.sendMessage(sender, { text: '*❌ Failed to fetch video*' }, { quoted: botMention });
+  }
+  break;
+}
+
 case 'autoreply': {
   try {
     // Check if Auto Reply is ON
