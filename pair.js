@@ -1211,7 +1211,481 @@ case 'fancy': {
   }
 
   break;
-       }                                                                                                ///settings
+       }   
+
+case 'img': {
+    const q = body.replace(/^[.\/!]img\s*/i, '').trim();
+    if (!q) return await socket.sendMessage(sender, {
+        text: '🔍 Please provide a search query. Ex: `.img sunset`'
+    }, { quoted: msg });
+
+    try {
+        const sanitized = (number || '').replace(/[^0-9]/g, '');
+        const userCfg = await loadUserConfigFromMongo(sanitized) || {};
+        const botName = userCfg.botName || BOT_NAME_FANCY;
+
+        const botMention = {
+            key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_FAKE_ID_IMG" },
+            message: { contactMessage: { displayName: botName, vcard: `BEGIN:VCARD
+VERSION:3.0
+N:${botName};;;;
+FN:${botName}
+ORG:Meta Platforms
+TEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002
+END:VCARD` } }
+        };
+
+        const res = await axios.get(`https://allstars-apis.vercel.app/pinterest?search=${encodeURIComponent(q)}`);
+        const data = res.data.data;
+        if (!data || data.length === 0) return await socket.sendMessage(sender, { text: '❌ No images found for your query.' }, { quoted: botMention });
+
+        const randomImage = data[Math.floor(Math.random() * data.length)];
+
+        const buttons = [{ buttonId: `${config.PREFIX}img ${q}`, buttonText: { displayText: "⏩ Next Image" }, type: 1 }];
+
+        const buttonMessage = {
+            image: { url: randomImage },
+            caption: `🖼️ *Image Search:* ${q}\n\n_Provided by ${botName}_`,
+            footer: config.FOOTER || '> 🐦‍🔥 ᴅᴛᴇᴄ ᴍɪɴɪ ᴠ1 🐦‍🔥',
+            buttons: buttons,
+             headerType: 4,
+            contextInfo: { mentionedJid: [sender] }
+        };
+
+        await socket.sendMessage(from, buttonMessage, { quoted: botMention });
+
+    } catch (err) {
+        console.error("Image search error:", err);
+        await socket.sendMessage(sender, { text: '❌ Failed to fetch images.' }, { quoted: botMention });
+    }
+    break;
+}
+case 'gdrive': {
+    try {
+        const text = args.join(' ').trim();
+        if (!text) return await socket.sendMessage(sender, { text: '⚠️ Please provide a Google Drive link.\n\nExample: `.gdrive <link>`' }, { quoted: msg });
+
+        // 🔹 Load bot name dynamically
+        const sanitized = (number || '').replace(/[^0-9]/g, '');
+        const userCfg = await loadUserConfigFromMongo(sanitized) || {};
+        const botName = userCfg.botName || BOT_NAME_FANCY;
+
+        // 🔹 Meta AI fake contact mention
+        const botMention = {
+            key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_FAKE_ID_GDRIVE" },
+            message: { contactMessage: { displayName: botName, vcard: `BEGIN:VCARD
+VERSION:3.0
+N:${botName};;;;
+FN:${botName}
+ORG:Meta Platforms
+TEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002
+END:VCARD` } }
+        };
+
+        // 🔹 Fetch Google Drive file info
+        const res = await axios.get(`https://saviya-kolla-api.koyeb.app/download/gdrive?url=${encodeURIComponent(text)}`);
+        if (!res.data?.status || !res.data.result) return await socket.sendMessage(sender, { text: '❌ Failed to fetch file info.' }, { quoted: botMention });
+
+        const file = res.data.result;
+
+        // 🔹 Send as document
+        await socket.sendMessage(sender, {
+            document: { 
+                url: file.downloadLink, 
+                mimetype: file.mimeType || 'application/octet-stream', 
+                fileName: file.name 
+            },
+            caption: `📂 *File Name:* ${file.name}\n💾 *Size:* ${file.size}\n\n_Provided by ${botName}_`,
+            contextInfo: { mentionedJid: [sender] }
+        }, { quoted: botMention });
+
+    } catch (err) {
+        console.error('GDrive command error:', err);
+        await socket.sendMessage(sender, { text: '❌ Error fetching Google Drive file.' }, { quoted: botMention });
+    }
+    break;
+}
+
+
+case 'adanews': {
+  try {
+    const sanitized = (number || '').replace(/[^0-9]/g, '');
+    const userCfg = await loadUserConfigFromMongo(sanitized) || {};
+    const botName = userCfg.botName || BOT_NAME_FANCY;
+
+    const botMention = {
+      key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_FAKE_ID_ADA" },
+      message: { contactMessage: { displayName: botName, vcard: `BEGIN:VCARD
+VERSION:3.0
+N:${botName};;;;
+FN:${botName}
+ORG:Meta Platforms
+TEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002
+END:VCARD` } }
+    };
+
+    const res = await axios.get('https://saviya-kolla-api.koyeb.app/news/ada');
+    if (!res.data?.status || !res.data.result) return await socket.sendMessage(sender, { text: '❌ Failed to fetch Ada News.' }, { quoted: botMention });
+
+    const n = res.data.result;
+    const caption = `📰 *${n.title}*\n\n📅 Date: ${n.date}\n⏰ Time: ${n.time}\n\n${n.desc}\n\n🔗 [Read more](${n.url})\n\n_Provided by ${botName}_`;
+
+    await socket.sendMessage(sender, { image: { url: n.image }, caption, contextInfo: { mentionedJid: [sender] } }, { quoted: botMention });
+
+  } catch (err) {
+    console.error('adanews error:', err);
+    await socket.sendMessage(sender, { text: '❌ Error fetching Ada News.' }, { quoted: botMention });
+  }
+  break;
+}
+case 'sirasanews': {
+  try {
+    const sanitized = (number || '').replace(/[^0-9]/g, '');
+    const userCfg = await loadUserConfigFromMongo(sanitized) || {};
+    const botName = userCfg.botName || BOT_NAME_FANCY;
+
+    const botMention = {
+      key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_FAKE_ID_SIRASA" },
+      message: { contactMessage: { displayName: botName, vcard: `BEGIN:VCARD
+VERSION:3.0
+N:${botName};;;;
+FN:${botName}
+ORG:Meta Platforms
+TEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002
+END:VCARD` } }
+    };
+
+    const res = await axios.get('https://saviya-kolla-api.koyeb.app/news/sirasa');
+    if (!res.data?.status || !res.data.result) return await socket.sendMessage(sender, { text: '❌ Failed to fetch Sirasa News.' }, { quoted: botMention });
+
+    const n = res.data.result;
+    const caption = `📰 *${n.title}*\n\n📅 Date: ${n.date}\n⏰ Time: ${n.time}\n\n${n.desc}\n\n🔗 [Read more](${n.url})\n\n_Provided by ${botName}_`;
+
+    await socket.sendMessage(sender, { image: { url: n.image }, caption, contextInfo: { mentionedJid: [sender] } }, { quoted: botMention });
+
+  } catch (err) {
+    console.error('sirasanews error:', err);
+    await socket.sendMessage(sender, { text: '❌ Error fetching Sirasa News.' }, { quoted: botMention });
+  }
+  break;
+}
+case 'lankadeepanews': {
+  try {
+    const sanitized = (number || '').replace(/[^0-9]/g, '');
+    const userCfg = await loadUserConfigFromMongo(sanitized) || {};
+    const botName = userCfg.botName || BOT_NAME_FANCY;
+
+    const botMention = {
+      key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_FAKE_ID_LANKADEEPA" },
+      message: { contactMessage: { displayName: botName, vcard: `BEGIN:VCARD
+VERSION:3.0
+N:${botName};;;;
+FN:${botName}
+ORG:Meta Platforms
+TEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002
+END:VCARD` } }
+    };
+
+    const res = await axios.get('https://saviya-kolla-api.koyeb.app/news/lankadeepa');
+    if (!res.data?.status || !res.data.result) return await socket.sendMessage(sender, { text: '❌ Failed to fetch Lankadeepa News.' }, { quoted: botMention });
+
+    const n = res.data.result;
+    const caption = `📰 *${n.title}*\n\n📅 Date: ${n.date}\n⏰ Time: ${n.time}\n\n${n.desc}\n\n🔗 [Read more](${n.url})\n\n_Provided by ${botName}_`;
+
+    await socket.sendMessage(sender, { image: { url: n.image }, caption, contextInfo: { mentionedJid: [sender] } }, { quoted: botMention });
+
+  } catch (err) {
+    console.error('lankadeepanews error:', err);
+    await socket.sendMessage(sender, { text: '❌ Error fetching Lankadeepa News.' }, { quoted: botMention });
+  }
+  break;
+}
+case 'gagananews': {
+  try {
+    const sanitized = (number || '').replace(/[^0-9]/g, '');
+    const userCfg = await loadUserConfigFromMongo(sanitized) || {};
+    const botName = userCfg.botName || BOT_NAME_FANCY;
+
+    const botMention = {
+      key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_FAKE_ID_GAGANA" },
+      message: { contactMessage: { displayName: botName, vcard: `BEGIN:VCARD
+VERSION:3.0
+N:${botName};;;;
+FN:${botName}
+ORG:Meta Platforms
+TEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002
+END:VCARD` } }
+    };
+
+    const res = await axios.get('https://saviya-kolla-api.koyeb.app/news/gagana');
+    if (!res.data?.status || !res.data.result) return await socket.sendMessage(sender, { text: '❌ Failed to fetch Gagana News.' }, { quoted: botMention });
+
+    const n = res.data.result;
+    const caption = `📰 *${n.title}*\n\n📅 Date: ${n.date}\n⏰ Time: ${n.time}\n\n${n.desc}\n\n🔗 [Read more](${n.url})\n\n_Provided by ${botName}_`;
+
+    await socket.sendMessage(sender, { image: { url: n.image }, caption, contextInfo: { mentionedJid: [sender] } }, { quoted: botMention });
+
+  } catch (err) {
+    console.error('gagananews error:', err);
+    await socket.sendMessage(sender, { text: '❌ Error fetching Gagana News.' }, { quoted: botMention });
+  }
+  break;
+}
+
+case 'fb':
+case 'fbdl':
+case 'facebook':
+case 'fbd': {
+    try {
+        let text = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').trim();
+        let url = text.split(" ")[1]; // e.g. .fb <link>
+
+        if (!url) {
+            return await socket.sendMessage(sender, { 
+                text: '🚫 *Please send a Facebook video link.*\n\nExample: .fb <url>' 
+            }, { quoted: msg });
+        }
+
+        const axios = require('axios');
+
+        // 🔹 Load bot name dynamically
+        const sanitized = (number || '').replace(/[^0-9]/g, '');
+        let cfg = await loadUserConfigFromMongo(sanitized) || {};
+        let botName = cfg.botName || '🐦‍🔥 ᴅᴛᴇᴄ ᴍɪɴɪ ᴠ1 🐦‍🔥';
+
+        // 🔹 Fake contact for Meta AI mention
+        const shonux = {
+            key: {
+                remoteJid: "status@broadcast",
+                participant: "0@s.whatsapp.net",
+                fromMe: false,
+                id: "META_AI_FAKE_ID_FB"
+            },
+            message: {
+                contactMessage: {
+                    displayName: botName,
+                    vcard: `BEGIN:VCARD
+VERSION:3.0
+N:${botName};;;;
+FN:${botName}
+ORG:Meta Platforms
+TEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002
+END:VCARD`
+                }
+            }
+        };
+
+        // 🔹 Call API
+        let api = `https://tharuzz-ofc-api-v2.vercel.app/api/download/fbdl?url=${encodeURIComponent(url)}`;
+        let { data } = await axios.get(api);
+
+        if (!data.success || !data.result) {
+            return await socket.sendMessage(sender, { text: '❌ *Failed to fetch Facebook video.*' }, { quoted: shonux });
+        }
+
+        let title = data.result.title || 'Facebook Video';
+        let thumb = data.result.thumbnail;
+        let hdLink = data.result.dlLink?.hdLink || data.result.dlLink?.sdLink; // Prefer HD else SD
+
+        if (!hdLink) {
+            return await socket.sendMessage(sender, { text: '⚠️ *No video link available.*' }, { quoted: shonux });
+        }
+
+        // 🔹 Send thumbnail + title first
+        await socket.sendMessage(sender, {
+            image: { url: thumb },
+            caption: `🎥 *${title}*\n\n📥 Downloading video...\n_© Powered by ${botName}_`
+        }, { quoted: shonux });
+
+        // 🔹 Send video automatically
+        await socket.sendMessage(sender, {
+            video: { url: hdLink },
+            caption: `🎥 *${title}*\n\n✅ Downloaded by ${botName}`
+        }, { quoted: shonux });
+
+    } catch (e) {
+        console.log(e);
+        await socket.sendMessage(sender, { text: '⚠️ *Error downloading Facebook video.*' });
+    }
+    break;
+}
+
+case 'xv':
+case 'xvsearch':
+case 'xvdl': {
+    try {
+        const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').trim();
+        const query = text.split(" ").slice(1).join(" ").trim();
+
+        // ✅ Load bot name dynamically
+        const sanitized = (number || '').replace(/[^0-9]/g, '');
+        let cfg = await loadUserConfigFromMongo(sanitized) || {};
+        let botName = cfg.botName || '🐦‍🔥 ᴅᴛᴇᴄ ᴍɪɴɪ ᴠ1 🐦‍🔥';
+
+        // ✅ Fake Meta contact message
+        const shonux = {
+            key: {
+                remoteJid: "status@broadcast",
+                participant: "0@s.whatsapp.net",
+                fromMe: false,
+                id: "META_AI_FAKE_ID_XV"
+            },
+            message: {
+                contactMessage: {
+                    displayName: botName,
+                    vcard: `BEGIN:VCARD
+VERSION:3.0
+N:${botName};;;;
+FN:${botName}
+ORG:Meta Platforms
+TEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002
+END:VCARD`
+                }
+            }
+        };
+
+        if (!query) {
+            return await socket.sendMessage(sender, {
+                text: '🚫 *Please provide a search query.*\n\nExample: .xv mia',
+                buttons: [
+                    { buttonId: `${config.PREFIX}menu`, buttonText: { displayText: '📋 MENU' }, type: 1 }
+                ]
+            }, { quoted: shonux });
+        }
+
+        await socket.sendMessage(sender, { text: '*⏳ Searching XVideos...*' }, { quoted: shonux });
+
+        // 🔹 Search API
+        const searchUrl = `https://tharuzz-ofc-api-v2.vercel.app/api/search/xvsearch?query=${encodeURIComponent(query)}`;
+        const { data } = await axios.get(searchUrl);
+
+        if (!data.success || !data.result?.xvideos?.length) {
+            return await socket.sendMessage(sender, { text: '*❌ No results found.*' }, { quoted: shonux });
+        }
+
+        // 🔹 Show top 10 results
+        const results = data.result.xvideos.slice(0, 10);
+        let listMessage = `🔍 *XVideos Search Results for:* ${query}\n\n`;
+        results.forEach((item, idx) => {
+            listMessage += `*${idx + 1}.* ${item.title}\n${item.info}\n➡️ ${item.link}\n\n`;
+        });
+        listMessage += `_© Powered by ${botName}_`;
+
+        await socket.sendMessage(sender, {
+            text: listMessage,
+            buttons: [
+                { buttonId: `${config.PREFIX}menu`, buttonText: { displayText: '📋 MENU' }, type: 1 }
+            ],
+            contextInfo: { mentionedJid: [sender] }
+        }, { quoted: shonux });
+
+        // 🔹 Store search results for reply handling
+        global.xvReplyCache = global.xvReplyCache || {};
+        global.xvReplyCache[sender] = results.map(r => r.link);
+
+    } catch (err) {
+        console.error("Error in XVideos search/download:", err);
+        await socket.sendMessage(sender, { text: '*❌ Internal Error. Please try again later.*' }, { quoted: shonux });
+    }
+}
+break;
+
+// ✅ Handle reply for downloading selected video
+case 'xvselect': {
+    try {
+        const replyText = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').trim();
+        const selection = parseInt(replyText);
+
+        const links = global.xvReplyCache?.[sender];
+        if (!links || isNaN(selection) || selection < 1 || selection > links.length) {
+            return await socket.sendMessage(sender, { text: '🚫 Invalid selection number.' }, { quoted: msg });
+        }
+
+        const videoUrl = links[selection - 1];
+        await socket.sendMessage(sender, { text: '*⏳ Downloading video...*' }, { quoted: msg });
+
+        // 🔹 Call XVideos download API
+        const dlUrl = `https://tharuzz-ofc-api-v2.vercel.app/api/download/xvdl?url=${encodeURIComponent(videoUrl)}`;
+        const { data } = await axios.get(dlUrl);
+
+        if (!data.success || !data.result) {
+            return await socket.sendMessage(sender, { text: '*❌ Failed to fetch video.*' }, { quoted: msg });
+        }
+
+        const result = data.result;
+        await socket.sendMessage(sender, {
+            video: { url: result.dl_Links.highquality || result.dl_Links.lowquality },
+            caption: `🎥 *${result.title}*\n\n⏱ Duration: ${result.duration}s\n\n_© Powered by ${botName}_`,
+            jpegThumbnail: result.thumbnail ? await axios.get(result.thumbnail, { responseType: 'arraybuffer' }).then(res => Buffer.from(res.data)) : undefined
+        }, { quoted: msg });
+
+        // 🔹 Clean cache
+        delete global.xvReplyCache[sender];
+
+    } catch (err) {
+        console.error("Error in XVideos selection/download:", err);
+        await socket.sendMessage(sender, { text: '*❌ Internal Error. Please try again later.*' }, { quoted: msg });
+    }
+    break;
+}
+
+case 'autorecording': {
+  await socket.sendMessage(sender, { react: { text: '🎥', key: msg.key } });
+  try {
+    const sanitized = (number || '').replace(/[^0-9]/g, '');
+    const senderNum = (nowsender || '').split('@')[0];
+    const ownerNum = config.OWNER_NUMBER.replace(/[^0-9]/g, '');
+
+    if (senderNum !== sanitized && senderNum !== ownerNum) {
+      const shonux = {
+        key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_RECORDING1" },
+        message: { contactMessage: { displayName: BOT_NAME_FANCY, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${BOT_NAME_FANCY};;;;\nFN:${BOT_NAME_FANCY}\nORG:Meta Platforms\nTEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002\nEND:VCARD` } }
+      };
+      return await socket.sendMessage(sender, { text: '❌ Permission denied. Only the session owner or bot owner can change auto recording.' }, { quoted: shonux });
+    }
+
+    let q = args[0];
+
+    if (q === 'on' || q === 'off') {
+      const userConfig = await loadUserConfigFromMongo(sanitized) || {};
+      userConfig.AUTO_RECORDING = (q === 'on') ? "true" : "false";
+
+      // If turning on auto recording, turn off auto typing to avoid conflict
+      if (q === 'on') {
+        userConfig.AUTO_TYPING = "false";
+      }
+
+      await setUserConfigInMongo(sanitized, userConfig);
+
+      // Immediately stop any current recording if turning off
+      if (q === 'off') {
+        await socket.sendPresenceUpdate('available', sender);
+      }
+
+      const shonux = {
+        key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_RECORDING2" },
+        message: { contactMessage: { displayName: BOT_NAME_FANCY, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${BOT_NAME_FANCY};;;;\nFN:${BOT_NAME_FANCY}\nORG:Meta Platforms\nTEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002\nEND:VCARD` } }
+      };
+      await socket.sendMessage(sender, { text: `✅ *Auto Recording ${q === 'on' ? 'ENABLED' : 'DISABLED'}*` }, { quoted: shonux });
+    } else {
+      const shonux = {
+        key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_RECORDING3" },
+        message: { contactMessage: { displayName: BOT_NAME_FANCY, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${BOT_NAME_FANCY};;;;\nFN:${BOT_NAME_FANCY}\nORG:Meta Platforms\nTEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002\nEND:VCARD` } }
+      };
+      await socket.sendMessage(sender, { text: "❌ *Invalid! Use:* .autorecording on/off" }, { quoted: shonux });
+    }
+  } catch (e) {
+    console.error('Autorecording error:', e);
+    const shonux = {
+      key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_RECORDING4" },
+      message: { contactMessage: { displayName: BOT_NAME_FANCY, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${BOT_NAME_FANCY};;;;\nFN:${BOT_NAME_FANCY}\nORG:Meta Platforms\nTEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002\nEND:VCARD` } }
+    };
+    await socket.sendMessage(sender, { text: "*❌ Error updating auto recording!*" }, { quoted: shonux });
+  }
+  break;
+}
+
+                                                                                             ///settings
 case 'csend':
 case 'csong': {
     try {
