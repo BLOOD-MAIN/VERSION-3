@@ -958,59 +958,61 @@ case 'capedit': {
     break;
 }
 
-case 'xx':
-case 'xvideo2': {
+case 'pronhub': {
   try {
-    const query = args.join(" ");
-    if (!query) return reply('*❌ Usage: .xvideo <url or search query>*');
+    const q = args.join(" ");
+    if (!q) return reply("💭 *ඔයාට ගැලපෙන video එකක් සොයන්න query එකක් දෙන්න!* 🍑");
 
-    const botName = BOT_NAME_FANCY || 'Blood XMD Mini Bot';
-    const botMention = {
-      key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: `META_AI_FAKE_ID_${command.toUpperCase()}` },
-      message: { contactMessage: { displayName: botName, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${botName};;;;\nFN:${botName}\nORG:Meta Platforms\nTEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002\nEND:VCARD` } }
-    };
+    const axios = require('axios');
+    const cheerio = require('cheerio');
 
-    let videoData = null;
-    let isURL = false;
+    // Pornhub search URL
+    const searchUrl = `https://www.pornhub.com/video/search?search=${encodeURIComponent(q)}`;
 
-    if (query.startsWith('http')) {
-      videoData = { url: query, title: 'Direct Video', duration: '' };
-      isURL = true;
-    } else {
-      await socket.sendMessage(sender, { react: { text: '🔍', key: msg.key } }, { quoted: botMention });
-      const searchRes = await axios.get(`https://saviya-kolla-api.koyeb.app/search/xvideos?query=${encodeURIComponent(query)}`).catch(() => null);
-      if (!searchRes?.data?.status || !searchRes.data.result?.length) {
-        return await socket.sendMessage(sender, { text: '*❌ No results found or API unavailable.*' }, { quoted: botMention });
+    const { data: html } = await axios.get(searchUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
       }
-      videoData = searchRes.data.result[0];
-    }
+    });
 
-    const dlRes = await axios.get(`https://saviya-kolla-api.koyeb.app/download/xvideos?url=${encodeURIComponent(videoData.url)}`).catch(() => null);
-    if (!dlRes?.data?.status || !dlRes.data.result?.url) {
-      return await socket.sendMessage(sender, { text: '*❌ Unable to fetch video. API may be down.*' }, { quoted: botMention });
-    }
+    const $ = cheerio.load(html);
+    const videoCard = $('.phimage').first().parent(); // Select first video
 
-    const dl = dlRes.data.result;
+    if (!videoCard.length) return reply("❌ *Video එක හමු නොවුණා!*");
 
-    const caption = `📹 *${dl.title || videoData.title}*\n⏱️ ${isURL ? '' : `Duration: ${videoData.duration || 'N/A'}`}\n👁️ Views: ${dl.views || 'N/A'}\n👍 Likes: ${dl.likes || 'N/A'} | 👎 Dislikes: ${dl.dislikes || 'N/A'}\n\n_Provided by ${botName}_`;
+    const title = videoCard.find('.title').text().trim();
+    const url = 'https://www.pornhub.com' + videoCard.find('a').attr('href');
+    const thumbnail = videoCard.find('img').attr('data-src') || videoCard.find('img').attr('src');
+    const duration = videoCard.find('.duration').text().trim();
+    const views = videoCard.find('.views').text().trim();
+
+    const caption = `🍑 *PRONHUB VIDEO SEARCH* 🔞
+
+*📋 𝗡𝗔𝗠𝗘 ➟* ${title}
+*⏱️ 𝗗𝗨𝗥𝗔𝗧𝗜𝗢𝗡 ➟* ${duration}
+*👀 𝗩𝗜𝗘𝗪𝗦 ➟* ${views}
+*📎 URL ➟* ${url}
+
+> 𝗕𝗟𝗢𝗢𝗗-𝘅-𝗠𝗗-𝗠𝗜𝗡𝗜 🔥`;
 
     const buttons = [
-      { buttonId: `${config.PREFIX}xvdl ${videoData.url}`, buttonText: { displayText: '🎬 Download Video' }, type: 1 },
-      { buttonId: `${config.PREFIX}xvaudio ${videoData.url}`, buttonText: { displayText: '🎵 Download Audio' }, type: 1 }
+      { buttonId: `${config.PREFIX}pronplay ${url}`, buttonText: { displayText: 'ᴠɪᴅᴇᴏ ᴘʟᴀʏ ▶️' }, type: 1 },
+      { buttonId: `${config.PREFIX}prondoc ${url}`, buttonText: { displayText: 'ᴅᴏᴄᴜᴍᴇɴᴛ ᴅᴏᴡɴʟᴏᴀᴅ 📂' }, type: 1 },
+      { buttonId: `${config.PREFIX}pronptt ${url}`, buttonText: { displayText: 'ᴀᴜᴅɪᴏ ᴅᴏᴡɴʟᴏᴀᴅ 🎤' }, type: 1 }
     ];
 
     await socket.sendMessage(sender, {
-      image: { url: dl.thumbnail || 'https://i.ibb.co/0FJf4Hp/image1.jpg' },
+      image: { url: thumbnail },
       caption,
-      footer: `🧠 ${botName} ⚡`,
+      footer: '🧠 BLOOD XMD MINI BOT ⚡ By Sachithra Madusanka',
       buttons,
       headerType: 1,
       contextInfo: fakeForward
-    }, { quoted: botMention });
+    }, { quoted: msg });
 
-  } catch (err) {
-    console.error('xvideo error:', err);
-    await socket.sendMessage(sender, { text: '*❌ Failed to fetch video. Check your URL or query!*' }, { quoted: botMention });
+  } catch (e) {
+    console.error('Pronhub Command Error:', e);
+    reply("⚠️ *දෝෂයක් ඇතිවිය! පසුව නැවත උත්සාහ කරන්න.*");
   }
   break;
 }
