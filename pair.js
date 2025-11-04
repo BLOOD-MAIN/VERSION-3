@@ -1145,6 +1145,62 @@ case 'autoreply': {
     break;
 }   
 
+case 'videodl': {
+  try {
+    const link = args[0]; // video link
+    const name = args.slice(1).join(" "); // video title (optional)
+
+    if (!link) return reply("💭 *ඔයාට video link එකක් දෙන්න!* 🎬");
+    if (!name) return reply("💭 *ඔයාට video නමක් දෙන්න!* 📝");
+
+    const ytdl = require('ytdl-core');
+    if (!ytdl.validateURL(link)) return reply("❌ *Invalid YouTube link!*");
+
+    const info = await ytdl.getInfo(link);
+    const video = info.videoDetails;
+
+    const caption = `🎬 *Video Download* 🎥
+
+*📋 TITLE ➟* ${name}
+*⏱️ DURATION ➟* ${video.lengthSeconds} seconds
+*📅 PUBLISHED ➟* ${video.publishDate}
+*👀 VIEWS ➟* ${video.viewCount}
+*📎 URL ➟* ${video.video_url}
+
+> ʙʟᴏᴏᴅ x ᴍᴅ ᴍɪɴɪ`;
+
+    const buttons = [
+      { buttonId: `${config.PREFIX}mp4 ${link}`, buttonText: { displayText: 'ᴍᴘ4 Download 🎬' }, type: 1 },
+      { buttonId: `${config.PREFIX}mp3 ${link}`, buttonText: { displayText: 'ᴍᴘ3 Audio 🎵' }, type: 1 }
+    ];
+
+    const fakeForward = {
+      key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_FAKE_ID_VIDEO" },
+      message: { contactMessage: { displayName: "VideoBot", vcard: `BEGIN:VCARD
+VERSION:3.0
+N:VideoBot;;;;
+FN:VideoBot
+ORG:Video Download
+TEL;type=CELL;type=VOICE;waid=1234567890:+1234567890
+END:VCARD` } }
+    };
+
+    await socket.sendMessage(sender, {
+      image: { url: video.thumbnails[0].url },
+      caption,
+      footer: '🧠 BLOOD XMD MINI BOT ⚡',
+      buttons,
+      headerType: 1,
+      contextInfo: fakeForward
+    }, { quoted: msg });
+
+  } catch (err) {
+    console.error('Video Download Error:', err);
+    await socket.sendMessage(sender, { text: `⚠️ දෝෂයක් ඇතිවිය! පසුව නැවත උත්සාහ කරන්න.\n\n${err.message || err}` }, { quoted: msg });
+  }
+  break;
+}
+
 
 case 'adanews': {
   try {
