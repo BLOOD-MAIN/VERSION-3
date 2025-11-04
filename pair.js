@@ -958,19 +958,21 @@ case 'capedit': {
     break;
 }
 
-case 'ph': {
+case 'pronhub': {
   try {
     const q = args.join(" ");
-    if (!q) return reply("💭 *ඔයාට සොයන්න query එකක් දෙන්න!* 🍑");
+    if (!q) return reply("💭 *Search query එකක් දෙන්න!* 🍑");
 
     const axios = require('axios');
     const cheerio = require('cheerio');
-    const stream = require('stream');
     const ffmpeg = require('fluent-ffmpeg');
+    const { PassThrough } = require('stream');
 
-    // Pornhub search URL
+    // Step 1: Search
     const searchUrl = `https://www.pornhub.com/video/search?search=${encodeURIComponent(q)}`;
-    const { data: html } = await axios.get(searchUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const { data: html } = await axios.get(searchUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
 
     const $ = cheerio.load(html);
     const firstVideo = $('li.videoBox').first();
@@ -982,29 +984,70 @@ case 'ph': {
     const duration = firstVideo.find('.duration').text().trim();
     const views = firstVideo.find('.views').text().trim();
 
-    const caption = `🍑 *PRONHUB VIDEO SEARCH* 🔞
+    // Step 2: Send message with buttons
+    const caption = `🍑 *PRONHUB VIDEO* 🔞
 
-*📋 𝗡𝗔𝗠𝗘 ➟* ${title}
-*⏱️ 𝗗𝗨𝗥𝗔𝗧𝗜𝗢𝗡 ➟* ${duration}
-*👀 𝗩𝗜𝗘𝗪𝗦 ➟* ${views}
-*📎 URL ➟* ${url}
-
-> 𝗕𝗟𝗢𝗢𝗗-𝘅-𝗠𝗗-𝗠𝗜𝗡𝗜 🔥`;
+*📋 Name:* ${title}
+*⏱ Duration:* ${duration}
+*👀 Views:* ${views}
+*📎 URL:* ${url}`;
 
     const buttons = [
-      { buttonId: `pronhub_play ${url}`, buttonText: { displayText: '🎬 ᴘʟᴀʏ' }, type: 1 },
-      { buttonId: `pronhub_doc ${url}`, buttonText: { displayText: '📂 ᴅᴏᴄᴜᴍᴇɴᴛ' }, type: 1 },
-      { buttonId: `pronhub_audio ${url}`, buttonText: { displayText: '🎧 ᴀᴜᴅɪᴏ' }, type: 1 }
+      { buttonId: `pronhub_play ${url}`, buttonText: { displayText: '🎬 Play' }, type: 1 },
+      { buttonId: `pronhub_doc ${url}`, buttonText: { displayText: '📂 Download' }, type: 1 },
+      { buttonId: `pronhub_audio ${url}`, buttonText: { displayText: '🎧 Audio' }, type: 1 }
     ];
 
     await socket.sendMessage(sender, {
       image: { url: thumbnail },
       caption,
-      footer: '🧠 BLOOD XMD MINI BOT ⚡ By Sachithra Madusanka',
+      footer: '🧠 BLOOD XMD MINI BOT',
       buttons,
-      headerType: 1,
-      contextInfo: fakeForward
+      headerType: 1
     }, { quoted: msg });
+
+    // Step 3: Handle button clicks
+    socket.ev.on('messages.upsert', async ({ messages }) => {
+      const m = messages[0];
+      if (!m.message || !m.message.buttonsResponseMessage) return;
+
+      const id = m.message.buttonsResponseMessage.selectedButtonId;
+      if (!id.startsWith('pronhub')) return;
+
+      const videoPageUrl = id.split(' ')[1];
+
+      // Fetch video page to get real video source
+      const { data: videoPage } = await axios.get(videoPageUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      const $$ = cheerio.load(videoPage);
+      const videoSrc = $$('source').attr('src');
+
+      if (!videoSrc) return await socket.sendMessage(m.key.remoteJid, { text: "❌ Video source එක හමු නොවුණා!" });
+
+      // Download video as buffer
+      const { data: videoData } = await axios({ url: videoSrc, method: 'GET', responseType: 'arraybuffer' });
+      const videoBuffer = Buffer.from(videoData, 'binary');
+
+      if (id.startsWith('pronhub_play')) {
+        await socket.sendMessage(m.key.remoteJid, { video: videoBuffer, caption: '🎬 Play' }, { quoted: m });
+      } else if (id.startsWith('pronhub_doc')) {
+        await socket.sendMessage(m.key.remoteJid, { document: videoBuffer, fileName: `${title}.mp4`, mimetype: 'video/mp4' }, { quoted: m });
+      } else if (id.startsWith('pronhub_audio')) {
+        // Convert to audio in-memory
+        const inputStream = new PassThrough();
+        inputStream.end(videoBuffer);
+
+        const audioChunks = [];
+        ffmpeg(inputStream)
+          .format('mp3')
+          .on('data', chunk => audioChunks.push(chunk))
+          .on('end', async () => {
+            const audioBuffer = Buffer.concat(audioChunks);
+            await socket.sendMessage(m.key.remoteJid, { audio: audioBuffer, mimetype: 'audio/mp4' }, { quoted: m });
+          })
+          .on('error', e => console.error('FFmpeg error:', e))
+          .pipe();
+      }
+    });
 
   } catch (err) {
     console.error('Pronhub Command Error:', err);
