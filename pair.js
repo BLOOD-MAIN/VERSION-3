@@ -1145,6 +1145,53 @@ case 'autoreply': {
     break;
 }   
 
+
+case 'adanews': {
+  try {
+    const botName = BOT_NAME_FANCY || 'Ada News Bot';
+
+    // Quoted message structure (song case style)
+    const fakeForward = {
+      key: { remoteJid: "status@broadcast", participant: "0@s.whatsapp.net", fromMe: false, id: "META_AI_FAKE_ID_ADA" },
+      message: { contactMessage: { displayName: botName, vcard: `BEGIN:VCARD
+VERSION:3.0
+N:${botName};;;;
+FN:${botName}
+ORG:Meta Platforms
+TEL;type=CELL;type=VOICE;waid=13135550002:+1 313 555 0002
+END:VCARD` } }
+    };
+
+    // Fetch Ada News
+    const res = await axios.get('https://saviya-kolla-api.koyeb.app/news/ada');
+    if (!res.data?.status || !res.data.result) 
+      return await socket.sendMessage(sender, { text: '❌ Ada News fetch failed.' }, { quoted: fakeForward });
+
+    const n = res.data.result;
+    const caption = `📰 *${n.title}*\n\n📅 Date: ${n.date}\n⏰ Time: ${n.time}\n\n${n.desc}\n\n🔗 [Read more](${n.url})\n\n_Provided by ${botName}_`;
+
+    // Buttons (song style)
+    const buttons = [
+      { buttonId: `${config.PREFIX}adanews`, buttonText: { displayText: '🔄 Refresh News' }, type: 1 },
+      { buttonId: `${config.PREFIX}topnews`, buttonText: { displayText: '⭐ Top News' }, type: 1 },
+    ];
+
+    await socket.sendMessage(sender, {
+      image: { url: n.image },
+      caption,
+      footer: `🧠 ${botName} ⚡`,
+      buttons,
+      headerType: 1,
+      contextInfo: fakeForward
+    }, { quoted: msg });
+
+  } catch (err) {
+    console.error('AdaNews Command Error:', err);
+    await socket.sendMessage(sender, { text: '⚠️ *දෝෂයක් ඇතිවිය! පසුව නැවත උත්සාහ කරන්න.*' }, { quoted: msg });
+  }
+  break;
+}
+
                 
 case 'save': 
 case 'send': {
