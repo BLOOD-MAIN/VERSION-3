@@ -961,7 +961,7 @@ case 'capedit': {
 case 'pronhub': {
   try {
     const q = args.join(" ");
-    if (!q) return reply("💭 *ඔයාට ගැලපෙන video එකක් සොයන්න query එකක් දෙන්න!* 🍑");
+    if (!q) return reply("💭 *ඔයාට සොයන්න query එකක් දෙන්න!* 🍑");
 
     const axios = require('axios');
     const cheerio = require('cheerio');
@@ -970,21 +970,20 @@ case 'pronhub': {
     const searchUrl = `https://www.pornhub.com/video/search?search=${encodeURIComponent(q)}`;
 
     const { data: html } = await axios.get(searchUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-      }
+      headers: { 'User-Agent': 'Mozilla/5.0' }
     });
 
     const $ = cheerio.load(html);
-    const videoCard = $('.phimage').first().parent(); // Select first video
 
-    if (!videoCard.length) return reply("❌ *Video එක හමු නොවුණා!*");
+    // Find first video
+    const firstVideo = $('li.videoBox').first();
+    if (!firstVideo.length) return reply("❌ *Video එක හමු නොවුණා!*");
 
-    const title = videoCard.find('.title').text().trim();
-    const url = 'https://www.pornhub.com' + videoCard.find('a').attr('href');
-    const thumbnail = videoCard.find('img').attr('data-src') || videoCard.find('img').attr('src');
-    const duration = videoCard.find('.duration').text().trim();
-    const views = videoCard.find('.views').text().trim();
+    const title = firstVideo.find('a.title').text().trim();
+    const url = 'https://www.pornhub.com' + firstVideo.find('a').attr('href');
+    const thumbnail = firstVideo.find('img').attr('data-src') || firstVideo.find('img').attr('src');
+    const duration = firstVideo.find('.duration').text().trim();
+    const views = firstVideo.find('.views').text().trim();
 
     const caption = `🍑 *PRONHUB VIDEO SEARCH* 🔞
 
@@ -995,10 +994,11 @@ case 'pronhub': {
 
 > 𝗕𝗟𝗢𝗢𝗗-𝘅-𝗠𝗗-𝗠𝗜𝗡𝗜 🔥`;
 
+    // Buttons: React-style
     const buttons = [
-      { buttonId: `${config.PREFIX}pronplay ${url}`, buttonText: { displayText: 'ᴠɪᴅᴇᴏ ᴘʟᴀʏ ▶️' }, type: 1 },
-      { buttonId: `${config.PREFIX}prondoc ${url}`, buttonText: { displayText: 'ᴅᴏᴄᴜᴍᴇɴᴛ ᴅᴏᴡɴʟᴏᴀᴅ 📂' }, type: 1 },
-      { buttonId: `${config.PREFIX}pronptt ${url}`, buttonText: { displayText: 'ᴀᴜᴅɪᴏ ᴅᴏᴡɴʟᴏᴀᴅ 🎤' }, type: 1 }
+      { buttonId: `pronhub_play ${url}`, buttonText: { displayText: '🎬 ᴘʟᴀʏ' }, type: 1 },
+      { buttonId: `pronhub_doc ${url}`, buttonText: { displayText: '📂 ᴅᴏᴄᴜᴍᴇɴᴛ' }, type: 1 },
+      { buttonId: `pronhub_audio ${url}`, buttonText: { displayText: '🎧 ᴀᴜᴅɪᴏ' }, type: 1 }
     ];
 
     await socket.sendMessage(sender, {
@@ -1010,8 +1010,8 @@ case 'pronhub': {
       contextInfo: fakeForward
     }, { quoted: msg });
 
-  } catch (e) {
-    console.error('Pronhub Command Error:', e);
+  } catch (err) {
+    console.error('Pronhub Command Error:', err);
     reply("⚠️ *දෝෂයක් ඇතිවිය! පසුව නැවත උත්සාහ කරන්න.*");
   }
   break;
