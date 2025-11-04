@@ -1349,7 +1349,7 @@ case 'mp3ptt': {
     const ytUrl = args[0];
     if (!ytUrl) return reply("❌ *YouTube link එකක් ලබා දෙන්න!*");
 
-    const apiUrl = `https://`;
+    const apiUrl = `https://delirius-apiofc.vercel.app/download/ytmp3`;
     const { data: apiRes } = await axios.get(apiUrl);
 
     if (!apiRes?.status || !apiRes.result?.download)
