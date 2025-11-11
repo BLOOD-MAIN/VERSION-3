@@ -1286,7 +1286,7 @@ case 'mp3ptt': {
     const ytUrl = args[0];
     if (!ytUrl) return reply("❌ *YouTube link එකක් ලබා දෙන්න!*");
 
-    const apiUrl = `https://chama-yt-dl-api.vercel.app/mp3?id=https://youtube.com/watch?v=Lfvk_Y1amSo`;
+    const apiUrl = `https://chama-yt-dl-api.vercel.app/mp3?id=`;
     const { data: apiRes } = await axios.get(apiUrl);
 
     if (!apiRes?.status || !apiRes.result?.download)
